@@ -25,20 +25,26 @@
                     },
                     colors: {
                         primary: "#00e699",
-                        darkBg: "#060913"
+                        darkBg: "#040711"
                     },
                     animation: {
                         'float': 'float 6s ease-in-out infinite',
-                        'pulse-glow': 'pulseGlow 3s ease-in-out infinite'
+                        'float-slow': 'floatSlow 9s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 3s ease-in-out infinite',
+                        'wave-slow': 'wave 15s linear infinite'
                     },
                     keyframes: {
                         float: {
-                            '0%, 100%': { transform: 'translateY(0px)' },
-                            '50%': { transform: 'translateY(-12px)' }
+                            '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+                            '50%': { transform: 'translateY(-14px) rotate(1deg)' }
+                        },
+                        floatSlow: {
+                            '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+                            '50%': { transform: 'translateY(18px) rotate(-1.5deg)' }
                         },
                         pulseGlow: {
-                            '0%, 100%': { opacity: '0.4' },
-                            '50%': { opacity: '0.8' }
+                            '0%, 100%': { opacity: '0.3', transform: 'scale(1)' },
+                            '50%': { opacity: '0.7', transform: 'scale(1.05)' }
                         }
                     }
                 }
@@ -48,25 +54,25 @@
     <style>
         .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 400; }
         
-        /* UNIQUE AWESOME CYBER BACKGROUND SYSTEM */
+        /* ULTRA UNIQUE CYBER BACKGROUND SYSTEM */
         .cyber-bg {
-            background-color: #040711;
+            background-color: #030611;
             background-image: 
-                radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.18) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.15) 0px, transparent 50%),
-                radial-gradient(at 50% 100%, rgba(139, 92, 246, 0.12) 0px, transparent 50%);
+                radial-gradient(at 10% 10%, rgba(16, 185, 129, 0.22) 0px, transparent 45%),
+                radial-gradient(at 90% 20%, rgba(6, 182, 212, 0.18) 0px, transparent 50%),
+                radial-gradient(at 50% 90%, rgba(139, 92, 246, 0.16) 0px, transparent 50%);
         }
 
         .cyber-grid-pattern {
-            background-size: 40px 40px;
+            background-size: 50px 50px;
             background-image: 
-                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+                linear-gradient(to right, rgba(16, 185, 129, 0.04) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(16, 185, 129, 0.04) 1px, transparent 1px);
         }
 
         .glass-panel {
-            background: rgba(13, 20, 36, 0.7);
-            backdrop-filter: blur(20px);
+            background: rgba(10, 16, 31, 0.75);
+            backdrop-filter: blur(24px);
             border: 1px solid rgba(255, 255, 255, 0.09);
         }
 
@@ -79,45 +85,56 @@
             inset: -1px;
             border-radius: 1.5rem;
             padding: 1px;
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.5), rgba(6, 182, 212, 0.1), rgba(255, 255, 255, 0.05));
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.6), rgba(6, 182, 212, 0.2), rgba(255, 255, 255, 0.05));
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
             pointer-events: none;
         }
 
-        .glowing-orb-1 {
-            position: absolute;
-            top: 15%;
-            left: 10%;
-            width: 350px;
-            height: 350px;
-            background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, rgba(0,0,0,0) 70%);
-            filter: blur(60px);
+        /* Mouse Follower Halo Glow */
+        #cursor-glow {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, rgba(6, 182, 212, 0.06) 40%, transparent 70%);
             pointer-events: none;
-        }
-
-        .glowing-orb-2 {
-            position: absolute;
-            top: 40%;
-            right: 5%;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(6, 182, 212, 0.2) 0%, rgba(0,0,0,0) 70%);
-            filter: blur(70px);
-            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            transition: width 0.3s, height 0.3s;
         }
     </style>
 </head>
 <body class="cyber-bg font-body text-slate-100 min-h-screen selection:bg-emerald-500 selection:text-slate-950 relative overflow-x-hidden">
 
-    <!-- Ambient Glowing Orbs -->
-    <div class="glowing-orb-1"></div>
-    <div class="glowing-orb-2"></div>
-    <div class="absolute inset-0 cyber-grid-pattern pointer-events-none"></div>
+    <!-- Interactive Mouse Follower Halo Glow -->
+    <div id="cursor-glow"></div>
+
+    <!-- Interactive Canvas Particle Constellation Network -->
+    <canvas id="cyber-canvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+    <!-- Animated Cyber Grid Pattern Overlay -->
+    <div class="fixed inset-0 cyber-grid-pattern pointer-events-none z-0"></div>
+
+    <!-- Floating Background Holographic Stock Badges -->
+    <div class="fixed top-28 left-8 hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-2xl glass-panel text-xs font-bold text-emerald-400 border border-emerald-500/30 animate-float pointer-events-none z-0">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+        <span>NVDA ▲ $122.80 (+18.4% AI)</span>
+    </div>
+
+    <div class="fixed top-48 right-12 hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-2xl glass-panel text-xs font-bold text-cyan-400 border border-cyan-500/30 animate-float-slow pointer-events-none z-0">
+        <span class="material-symbols-outlined text-sm">payments</span>
+        <span>$25,000 Virtual Cash Included</span>
+    </div>
+
+    <div class="fixed bottom-32 left-12 hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-2xl glass-panel text-xs font-bold text-purple-400 border border-purple-500/30 animate-float pointer-events-none z-0">
+        <span class="material-symbols-outlined text-sm">auto_awesome</span>
+        <span>StockBuddy AI Copilot Active</span>
+    </div>
 
     <!-- Global Navigation -->
-    <div id="navbar-mount"></div>
+    <div id="navbar-mount" class="relative z-50"></div>
 
     <main class="pt-20 relative z-10">
         <!-- Live Ticker Tape (Only Mounted After Login!) -->
@@ -129,9 +146,9 @@
                 
                 <!-- Left Hero Text -->
                 <div class="lg:col-span-7 space-y-8 text-left">
-                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-headline font-bold uppercase tracking-wider shadow-lg shadow-emerald-500/10">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-headline font-bold uppercase tracking-wider shadow-lg shadow-emerald-500/10 backdrop-blur-md">
                         <span class="material-symbols-outlined text-base animate-spin">auto_awesome</span>
-                        AI-Powered Trading Copilot for Beginners
+                        Next-Gen AI Trading Platform for Beginners
                     </div>
 
                     <h1 class="text-4xl sm:text-6xl font-black font-headline tracking-tight text-white leading-tight">
@@ -196,7 +213,7 @@
         </section>
 
         <!-- UNIQUE COMPARISON SHOWCASE: TRADITIONAL VS STOCKCRAFT.AI -->
-        <section class="py-20 bg-slate-950/70 border-y border-slate-800/80 backdrop-blur-md">
+        <section class="py-20 bg-slate-950/80 border-y border-slate-800/80 backdrop-blur-xl">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
                 
                 <div class="text-center max-w-3xl mx-auto space-y-3">
@@ -362,7 +379,115 @@
                     </a>
                 `;
             }
+
+            // INITIALIZE MOUSE FOLLOW HALO & PARTICLE CONSTELLATION
+            initCyberBackground();
         });
+
+        // MOUSE FOLLOW & INTERACTIVE CANVAS CONSTELLATION SCRIPT
+        function initCyberBackground() {
+            const glow = document.getElementById('cursor-glow');
+            let mouseX = window.innerWidth / 2;
+            let mouseY = window.innerHeight / 2;
+
+            document.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+                glow.style.left = `${mouseX}px`;
+                glow.style.top = `${mouseY}px`;
+            });
+
+            // Canvas particle network with financial stock node labels
+            const canvas = document.getElementById('cyber-canvas');
+            const ctx = canvas.getContext('2d');
+            let width = canvas.width = window.innerWidth;
+            let height = canvas.height = window.innerHeight;
+
+            window.addEventListener('resize', () => {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            });
+
+            const stockLabels = ['NVDA ▲', 'AAPL ▲', 'MSFT ▲', 'SPY ▲', '+$25,000', 'AI BULLISH', 'INCREASING', '1H TICK'];
+            const particles = [];
+            const particleCount = 45;
+
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 0.6,
+                    vy: (Math.random() - 0.5) * 0.6,
+                    radius: Math.random() * 2 + 1,
+                    label: Math.random() > 0.6 ? stockLabels[Math.floor(Math.random() * stockLabels.length)] : null,
+                    color: Math.random() > 0.4 ? 'rgba(16, 185, 129, ' : 'rgba(6, 182, 212, '
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+
+                // Draw connecting laser lines between close particles & mouse
+                for (let i = 0; i < particles.length; i++) {
+                    const p1 = particles[i];
+
+                    // Move particles
+                    p1.x += p1.vx;
+                    p1.y += p1.vy;
+
+                    if (p1.x < 0 || p1.x > width) p1.vx *= -1;
+                    if (p1.y < 0 || p1.y > height) p1.vy *= -1;
+
+                    // Draw Particle Point
+                    ctx.beginPath();
+                    ctx.arc(p1.x, p1.y, p1.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p1.color + '0.8)';
+                    ctx.fill();
+
+                    // Render floating text tag if present
+                    if (p1.label) {
+                        ctx.font = '10px Outfit, sans-serif';
+                        ctx.fillStyle = p1.color + '0.6)';
+                        ctx.fillText(p1.label, p1.x + 6, p1.y + 3);
+                    }
+
+                    // Mouse Proximity Laser Connection
+                    const dxMouse = mouseX - p1.x;
+                    const dyMouse = mouseY - p1.y;
+                    const distMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
+
+                    if (distMouse < 180) {
+                        ctx.beginPath();
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(mouseX, mouseY);
+                        ctx.strokeStyle = p1.color + (1 - distMouse / 180) * 0.35 + ')';
+                        ctx.lineWidth = 0.8;
+                        ctx.stroke();
+                    }
+
+                    // Inter-particle Laser Lines
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const p2 = particles[j];
+                        const dx = p1.x - p2.x;
+                        const dy = p1.y - p2.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+
+                        if (dist < 140) {
+                            ctx.beginPath();
+                            ctx.moveTo(p1.x, p1.y);
+                            ctx.lineTo(p2.x, p2.y);
+                            ctx.strokeStyle = p1.color + (1 - dist / 140) * 0.18 + ')';
+                            ctx.lineWidth = 0.6;
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+        }
     </script>
 </body>
 </html>
