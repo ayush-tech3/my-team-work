@@ -704,6 +704,8 @@ window.StockCraft = (function () {
         },
 
         renderTickerTape: function () {
+            if (!this.isLoggedIn()) return '';
+
             const stocks = this.getStocks();
             const state = getLocalState();
             const items = stocks.map(s => {

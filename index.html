@@ -59,7 +59,7 @@
     <div id="navbar-mount"></div>
 
     <main class="pt-16">
-        <!-- Live Ticker Tape -->
+        <!-- Live Ticker Tape (Only Mounted After Login!) -->
         <div id="ticker-mount"></div>
 
         <!-- Hero Section: What is StockCraft.AI -->
@@ -236,14 +236,15 @@
     <script src="./prernaa/stock_engine.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Render Top Navbar & Ticker Tape
+            // Render Top Navbar
             document.getElementById('navbar-mount').innerHTML = StockCraft.renderNavbar('home');
-            document.getElementById('ticker-mount').innerHTML = StockCraft.renderTickerTape();
 
             const loggedIn = StockCraft.isLoggedIn();
             const ctaContainer = document.getElementById('landing-cta-container');
 
+            // ONLY SHOW TICKER TAPE AFTER LOGIN!
             if (loggedIn) {
+                document.getElementById('ticker-mount').innerHTML = StockCraft.renderTickerTape();
                 ctaContainer.innerHTML = `
                     <a href="/prernaa/user_dashboard/code.html" class="px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 rounded-2xl font-headline font-black text-base shadow-xl shadow-emerald-500/25 transition-all flex items-center gap-2">
                         <span class="material-symbols-outlined">dashboard</span>
@@ -255,6 +256,8 @@
                     </a>
                 `;
             } else {
+                // Keep ticker-mount completely empty before login
+                document.getElementById('ticker-mount').innerHTML = '';
                 ctaContainer.innerHTML = `
                     <a href="/prernaa/authentication/code.html?mode=register" class="px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 text-slate-950 rounded-2xl font-headline font-black text-base shadow-xl shadow-emerald-500/25 transition-all flex items-center gap-2 hover:scale-105">
                         <span class="material-symbols-outlined">person_add</span>
