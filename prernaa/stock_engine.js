@@ -1,7 +1,7 @@
 /**
  * StockCraft AI Engine - Core Client & Backend API Integration Layer
  * Handles Backend Authentication, Wallet Deposits, Paper Trading Orders,
- * Hourly Market Ticks, AI Response Engine, and Persistent Sessions.
+ * Hourly & Real-Time Market Ticks, Multi-Timeframe Datasets, AI Engine, and Sessions.
  */
 
 window.StockCraft = (function () {
@@ -9,7 +9,7 @@ window.StockCraft = (function () {
     const TOKEN_KEY = 'stockcraft_token_v1';
     const LOCAL_STATE_KEY = 'stockcraft_state_v1';
 
-    // Stock Market Database with Hourly Chart Data & Trend Predictions
+    // Stock Market Database with Multi-Timeframe Data (1H, 1D, 30D, 1Y)
     const INITIAL_STOCKS = [
         {
             symbol: 'NVDA',
@@ -31,8 +31,15 @@ window.StockCraft = (function () {
             aiScore: 96,
             aiSummary: '🔥 PREDICTED TO INCREASE: Surging demand for Blackwell AI chips. Hourly momentum is strongly bullish.',
             beginnerTip: 'Great growth choice! High hourly volatility, ideal for dollar-cost averaging.',
-            hourlyLabels: ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM (Close)'],
-            chartData: [118.50, 119.20, 120.10, 121.00, 120.80, 121.90, 122.30, 122.80]
+            // Multi-Timeframe Datasets
+            hourlyLabels: ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM'],
+            hourlyData: [118.50, 119.20, 120.10, 121.00, 120.80, 121.90, 122.30, 122.80],
+            dailyLabels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            dailyData: [112.40, 114.80, 116.20, 118.00, 119.50, 121.10, 122.80],
+            monthlyLabels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+            monthlyData: [98.50, 104.20, 110.00, 114.50, 118.90, 122.80],
+            yearlyLabels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            yearlyData: [62.00, 71.50, 84.20, 88.00, 96.50, 108.00, 112.50, 115.00, 118.20, 120.00, 121.50, 122.80]
         },
         {
             symbol: 'AAPL',
@@ -54,8 +61,14 @@ window.StockCraft = (function () {
             aiScore: 94,
             aiSummary: '📈 PREDICTED TO INCREASE: Apple Intelligence ecosystem rollout driving steady hourly price expansion.',
             beginnerTip: 'Safe anchor stock! Ideal for your first practice trade.',
-            hourlyLabels: ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM (Close)'],
-            chartData: [222.10, 222.80, 223.00, 223.50, 223.90, 224.10, 224.30, 224.50]
+            hourlyLabels: ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM'],
+            hourlyData: [222.10, 222.80, 223.00, 223.50, 223.90, 224.10, 224.30, 224.50],
+            dailyLabels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            dailyData: [218.00, 219.20, 220.50, 221.80, 222.40, 223.60, 224.50],
+            monthlyLabels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+            monthlyData: [205.00, 209.50, 214.00, 218.50, 221.00, 224.50],
+            yearlyLabels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            yearlyData: [182.00, 186.50, 191.00, 195.20, 202.00, 208.50, 212.00, 216.40, 219.00, 221.50, 223.00, 224.50]
         },
         {
             symbol: 'MSFT',
@@ -77,8 +90,14 @@ window.StockCraft = (function () {
             aiScore: 95,
             aiSummary: '📈 PREDICTED TO INCREASE: Cloud AI adoption accelerating across enterprise clients hourly.',
             beginnerTip: 'Very low risk. Microsoft is a rock-solid cornerstone stock.',
-            hourlyLabels: ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM (Close)'],
-            chartData: [445.00, 445.80, 446.20, 447.00, 447.50, 447.80, 448.00, 448.20]
+            hourlyLabels: ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM'],
+            hourlyData: [445.00, 445.80, 446.20, 447.00, 447.50, 447.80, 448.00, 448.20],
+            dailyLabels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            dailyData: [438.00, 440.50, 442.10, 444.00, 445.80, 447.00, 448.20],
+            monthlyLabels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+            monthlyData: [415.00, 422.00, 430.00, 436.50, 442.00, 448.20],
+            yearlyLabels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            yearlyData: [370.00, 385.00, 400.00, 412.00, 424.00, 432.00, 438.00, 441.00, 443.50, 445.00, 447.00, 448.20]
         },
         {
             symbol: 'SPY',
@@ -100,8 +119,14 @@ window.StockCraft = (function () {
             aiScore: 98,
             aiSummary: '🌟 PREDICTED TO INCREASE: Holds 500 top companies. Hourly index steady upward movement.',
             beginnerTip: 'The #1 recommended first stock purchase for all beginners!',
-            hourlyLabels: ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM (Close)'],
-            chartData: [549.80, 550.20, 550.80, 551.20, 551.50, 551.80, 552.00, 552.10]
+            hourlyLabels: ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM'],
+            hourlyData: [549.80, 550.20, 550.80, 551.20, 551.50, 551.80, 552.00, 552.10],
+            dailyLabels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            dailyData: [542.00, 544.50, 546.10, 548.00, 549.50, 550.80, 552.10],
+            monthlyLabels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+            monthlyData: [520.00, 528.00, 534.50, 540.00, 546.00, 552.10],
+            yearlyLabels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            yearlyData: [475.00, 488.00, 502.00, 512.00, 524.00, 532.00, 538.00, 542.00, 546.00, 548.50, 550.00, 552.10]
         },
         {
             symbol: 'TSLA',
@@ -123,8 +148,14 @@ window.StockCraft = (function () {
             aiScore: 64,
             aiSummary: '📉 CURRENTLY DECREASING: Hourly selling pressure due to short-term margin compression. Wait for support before buying.',
             beginnerTip: 'Caution: Currently in an hourly downward trend. Avoid putting large funds here until price stabilizes.',
-            hourlyLabels: ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM (Close)'],
-            chartData: [253.50, 251.20, 249.80, 248.50, 247.90, 247.10, 246.80, 246.30]
+            hourlyLabels: ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM'],
+            hourlyData: [253.50, 251.20, 249.80, 248.50, 247.90, 247.10, 246.80, 246.30],
+            dailyLabels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            dailyData: [262.00, 258.50, 255.00, 251.80, 249.00, 247.50, 246.30],
+            monthlyLabels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+            monthlyData: [285.00, 274.00, 265.00, 258.00, 251.00, 246.30],
+            yearlyLabels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            yearlyData: [240.00, 210.00, 180.00, 172.00, 195.00, 220.00, 245.00, 260.00, 255.00, 250.00, 248.00, 246.30]
         },
         {
             symbol: 'AMZN',
@@ -146,8 +177,14 @@ window.StockCraft = (function () {
             aiScore: 89,
             aiSummary: '📈 PREDICTED TO INCREASE: AWS growth and logistics automation driving positive hourly price candles.',
             beginnerTip: 'Great combination of retail dominance and cloud tech growth.',
-            hourlyLabels: ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM (Close)'],
-            chartData: [184.20, 184.80, 185.10, 185.50, 185.80, 186.10, 186.20, 186.40]
+            hourlyLabels: ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM'],
+            hourlyData: [184.20, 184.80, 185.10, 185.50, 185.80, 186.10, 186.20, 186.40],
+            dailyLabels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            dailyData: [179.50, 181.00, 182.40, 183.80, 184.90, 185.80, 186.40],
+            monthlyLabels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+            monthlyData: [168.00, 172.50, 177.00, 180.50, 183.50, 186.40],
+            yearlyLabels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            yearlyData: [145.00, 152.00, 160.00, 168.00, 174.00, 179.00, 181.50, 183.00, 184.50, 185.20, 186.00, 186.40]
         },
         {
             symbol: 'RELIANCE',
@@ -169,8 +206,14 @@ window.StockCraft = (function () {
             aiScore: 93,
             aiSummary: '📈 PREDICTED TO INCREASE: Booming Telecom (Jio) and Retail sectors pushing hourly prices up.',
             beginnerTip: 'Ideal starting stock for Indian market investors.',
-            hourlyLabels: ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM (Close)'],
-            chartData: [2965.00, 2968.00, 2972.00, 2975.00, 2978.00, 2979.00, 2980.00, 2980.00]
+            hourlyLabels: ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM'],
+            hourlyData: [2965.00, 2968.00, 2972.00, 2975.00, 2978.00, 2979.00, 2980.00, 2980.00],
+            dailyLabels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            dailyData: [2920.00, 2935.00, 2948.00, 2960.00, 2970.00, 2975.00, 2980.00],
+            monthlyLabels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+            monthlyData: [2800.00, 2840.00, 2890.00, 2925.00, 2955.00, 2980.00],
+            yearlyLabels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            yearlyData: [2450.00, 2520.00, 2600.00, 2680.00, 2750.00, 2820.00, 2880.00, 2920.00, 2945.00, 2960.00, 2972.00, 2980.00]
         },
         {
             symbol: 'TATAMOTORS',
@@ -192,8 +235,14 @@ window.StockCraft = (function () {
             aiScore: 82,
             aiSummary: '📉 CURRENTLY DECREASING: Minor hourly pullback. Good potential dip-buying opportunity for long-term investors.',
             beginnerTip: 'Short-term hourly dip. Watch for price reversal before placing order.',
-            hourlyLabels: ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM (Close)'],
-            chartData: [1022.00, 1020.00, 1018.00, 1016.00, 1015.00, 1014.00, 1013.00, 1012.00]
+            hourlyLabels: ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM'],
+            hourlyData: [1022.00, 1020.00, 1018.00, 1016.00, 1015.00, 1014.00, 1013.00, 1012.00],
+            dailyLabels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            dailyData: [1038.00, 1032.00, 1026.00, 1020.00, 1016.00, 1014.00, 1012.00],
+            monthlyLabels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+            monthlyData: [1080.00, 1062.00, 1045.00, 1030.00, 1020.00, 1012.00],
+            yearlyLabels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            yearlyData: [780.00, 840.00, 910.00, 960.00, 990.00, 1020.00, 1045.00, 1035.00, 1025.00, 1020.00, 1015.00, 1012.00]
         }
     ];
 
@@ -235,6 +284,39 @@ window.StockCraft = (function () {
     function saveLocalState(st) {
         localStorage.setItem(LOCAL_STATE_KEY, JSON.stringify(st));
     }
+
+    // REAL-TIME SECOND-BY-SECOND MARKET SIMULATION ENGINE
+    let liveTickerInterval = null;
+    function startLiveTickerEngine() {
+        if (liveTickerInterval) return;
+        liveTickerInterval = setInterval(() => {
+            // Pick a random stock to fluctuate
+            const stock = INITIAL_STOCKS[Math.floor(Math.random() * INITIAL_STOCKS.length)];
+            const deltaPercent = (Math.random() - 0.48) * 0.008; // small price tick
+            const oldPrice = stock.price;
+            stock.price = Math.max(1.00, parseFloat((stock.price * (1 + deltaPercent)).toFixed(2)));
+            stock.change = parseFloat((stock.price - (stock.hourlyData[0] || stock.price)).toFixed(2));
+            const pct = ((stock.change / stock.hourlyData[0]) * 100).toFixed(2);
+            stock.changePercent = `${pct >= 0 ? '+' : ''}${pct}%`;
+            stock.trendType = stock.change >= 0 ? 'INCREASING' : 'DECREASING';
+            stock.hourlyData[stock.hourlyData.length - 1] = stock.price;
+
+            // Dispatch live tick event to UI
+            window.dispatchEvent(new CustomEvent('stockcraft_tick', {
+                detail: {
+                    symbol: stock.symbol,
+                    price: stock.price,
+                    change: stock.change,
+                    changePercent: stock.changePercent,
+                    trendType: stock.trendType,
+                    stock: stock
+                }
+            }));
+        }, 2000); // 2 second live market tick interval!
+    }
+
+    // Start engine immediately
+    startLiveTickerEngine();
 
     // API Helper
     async function apiCall(endpoint, method = 'GET', data = null) {
@@ -613,7 +695,7 @@ window.StockCraft = (function () {
 
                     <a href="/prernaa/user_dashboard/code.html" class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 rounded-xl font-headline font-extrabold text-xs shadow-lg shadow-emerald-500/20 active:scale-95 transition-all">
                         <span class="material-symbols-outlined text-base">account_balance_wallet</span>
-                        <span>${state.currency}${state.cash.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>
+                        <span id="nav-cash-balance-display">${state.currency}${state.cash.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>
                     </a>
 
                     <button onclick="StockCraft.logout()" class="px-3.5 py-2 bg-slate-800 hover:bg-rose-500/20 text-rose-300 text-xs font-bold rounded-xl border border-slate-700 transition-all flex items-center gap-1">
@@ -792,7 +874,14 @@ async function executeWalletDeposit() {
 
     if (res && res.success) {
         StockCraft.ui.showToast('Money Added!', res.message, 'success');
-        setTimeout(() => window.location.reload(), 1200);
+        // AUTOMATIC INSTANT UI REFRESH WITHOUT FULL PAGE RELOAD!
+        if (typeof window.refreshDashboard === 'function') {
+            window.refreshDashboard();
+        } else {
+            const state = StockCraft.getState();
+            const navDisp = document.getElementById('nav-cash-balance-display');
+            if (navDisp) navDisp.innerText = `${state.currency}${state.cash.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}`;
+        }
     } else {
         StockCraft.ui.showToast('Deposit Failed', res ? res.message : 'Deposit failed', 'error');
     }

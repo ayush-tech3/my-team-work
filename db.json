@@ -6,7 +6,7 @@
       "email": "trader@stockcraft.ai",
       "passwordHash": "$2b$08$7xmmu7BxakwzryF2r7Dvpuei.8nA0xi6itv.FRyn8qNDtWrBy/Gui",
       "currency": "$",
-      "cash": 5440,
+      "cash": 30000,
       "plan": "Free Learner",
       "portfolio": [
         {
@@ -18,14 +18,89 @@
           "symbol": "AAPL",
           "shares": 15,
           "avgPrice": 215
-        },
-        {
-          "symbol": "NVDA",
-          "shares": 200,
-          "avgPrice": 122.8
         }
       ],
       "transactions": [
+        {
+          "id": "TXN-495816",
+          "symbol": "NVDA",
+          "type": "SELL",
+          "shares": 50,
+          "price": 122.8,
+          "total": 6140,
+          "timestamp": "2026-07-29T19:11:22.175Z",
+          "status": "EXECUTED"
+        },
+        {
+          "id": "TXN-291132",
+          "symbol": "NVDA",
+          "type": "SELL",
+          "shares": 10,
+          "price": 122.8,
+          "total": 1228,
+          "timestamp": "2026-07-29T19:10:52.294Z",
+          "status": "EXECUTED"
+        },
+        {
+          "id": "TXN-166871",
+          "symbol": "NVDA",
+          "type": "BUY",
+          "shares": 10,
+          "price": 122.8,
+          "total": 1228,
+          "timestamp": "2026-07-29T19:10:31.010Z",
+          "status": "EXECUTED"
+        },
+        {
+          "id": "TXN-489141",
+          "symbol": "NVDA",
+          "type": "SELL",
+          "shares": 30,
+          "price": 122.8,
+          "total": 3684,
+          "timestamp": "2026-07-29T19:10:19.000Z",
+          "status": "EXECUTED"
+        },
+        {
+          "id": "TXN-791487",
+          "symbol": "NVDA",
+          "type": "SELL",
+          "shares": 30,
+          "price": 122.8,
+          "total": 3684,
+          "timestamp": "2026-07-29T19:10:18.785Z",
+          "status": "EXECUTED"
+        },
+        {
+          "id": "TXN-553668",
+          "symbol": "NVDA",
+          "type": "SELL",
+          "shares": 30,
+          "price": 122.8,
+          "total": 3684,
+          "timestamp": "2026-07-29T19:10:18.008Z",
+          "status": "EXECUTED"
+        },
+        {
+          "id": "TXN-947031",
+          "symbol": "NVDA",
+          "type": "SELL",
+          "shares": 30,
+          "price": 122.8,
+          "total": 3684,
+          "timestamp": "2026-07-29T19:10:16.525Z",
+          "status": "EXECUTED"
+        },
+        {
+          "id": "TXN-982825",
+          "symbol": "NVDA",
+          "type": "SELL",
+          "shares": 30,
+          "price": 122.8,
+          "total": 3684,
+          "timestamp": "2026-07-29T19:10:10.577Z",
+          "status": "EXECUTED"
+        },
         {
           "id": "TXN-637772",
           "symbol": "NVDA",

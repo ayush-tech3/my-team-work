@@ -36,6 +36,10 @@
             backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
+        .price-flash-up { animation: flashGreen 0.6s ease-out; }
+        .price-flash-down { animation: flashRed 0.6s ease-out; }
+        @keyframes flashGreen { 0% { color: #10b981; } 50% { background: rgba(16,185,129,0.2); } 100% { color: white; } }
+        @keyframes flashRed { 0% { color: #f43f5e; } 50% { background: rgba(244,63,94,0.2); } 100% { color: white; } }
     </style>
 </head>
 <body class="bg-slate-950 font-body text-slate-100 min-h-screen selection:bg-emerald-500 selection:text-slate-950">
@@ -134,7 +138,7 @@
                         <!-- Price Pill -->
                         <div class="text-right">
                             <div class="text-2xl sm:text-3xl font-black font-headline text-white" id="active-price">$0.00</div>
-                            <div class="text-xs font-bold text-emerald-400" id="active-change">+0.00% (Hourly)</div>
+                            <div class="text-xs font-bold text-emerald-400" id="active-change">+0.00%</div>
                         </div>
                     </div>
 
@@ -145,7 +149,7 @@
                         </div>
                         <div>
                             <div class="flex items-center gap-2">
-                                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">StockBuddy AI Hourly Analysis:</span>
+                                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">StockBuddy AI Evaluation:</span>
                                 <span class="text-xs font-extrabold text-emerald-400 uppercase" id="active-ai-signal">STRONG BUY</span>
                             </div>
                             <p class="text-xs text-slate-300 mt-1 leading-relaxed" id="active-ai-summary">
@@ -154,16 +158,26 @@
                         </div>
                     </div>
 
-                    <!-- Chart Resolution Toolbar & Canvas -->
-                    <div class="flex justify-between items-center mb-3">
+                    <!-- FULLY WORKING TIMEFRAME BUTTONS: 1H Ticks, 1D Daily, 30D Monthly, 1Y Yearly -->
+                    <div class="flex flex-wrap justify-between items-center mb-4 gap-3">
                         <span class="text-xs font-bold text-slate-400 uppercase flex items-center gap-1">
                             <span class="material-symbols-outlined text-sm">schedule</span>
-                            <span>Hourly Market Resolution (1H)</span>
+                            <span id="timeframe-title-display">Live Market Resolution (1H Ticks)</span>
                         </span>
-                        <div class="flex gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-[11px] font-bold text-slate-400">
-                            <button class="px-2.5 py-1 rounded-lg bg-emerald-500 text-slate-950 font-extrabold">1H Ticks</button>
-                            <button class="px-2.5 py-1 rounded-lg hover:text-white">4H Ticks</button>
-                            <button class="px-2.5 py-1 rounded-lg hover:text-white">Daily</button>
+                        
+                        <div class="flex gap-1.5 bg-slate-950 p-1.5 rounded-xl border border-slate-800 text-xs font-bold">
+                            <button id="tf-btn-1H" onclick="setTimeframe('1H')" class="px-3 py-1.5 rounded-lg bg-emerald-500 text-slate-950 font-extrabold shadow transition-all">
+                                1H Ticks
+                            </button>
+                            <button id="tf-btn-1D" onclick="setTimeframe('1D')" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all">
+                                1D (Daily)
+                            </button>
+                            <button id="tf-btn-30D" onclick="setTimeframe('30D')" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all">
+                                30D (Monthly)
+                            </button>
+                            <button id="tf-btn-1Y" onclick="setTimeframe('1Y')" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all">
+                                1Y (Yearly)
+                            </button>
                         </div>
                     </div>
 
@@ -173,12 +187,12 @@
 
                     <div class="flex justify-between items-center mt-4 text-xs text-slate-400">
                         <span class="flex items-center gap-1">
-                            <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
-                            <span>Hourly Stock Price</span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span>
+                            <span>Historical Price Line</span>
                         </span>
                         <span class="flex items-center gap-1">
-                            <span class="w-2 h-2 rounded-full bg-cyan-400 inline-block"></span>
-                            <span>AI Forecast Trend</span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 inline-block"></span>
+                            <span>AI Forecast Trend Overlay</span>
                         </span>
                     </div>
                 </div>
@@ -225,7 +239,7 @@
                             <span class="material-symbols-outlined text-emerald-400">shopping_cart</span>
                             <span>Order Execution Terminal</span>
                         </h3>
-                        <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-semibold">HOURLY TRADING</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-semibold">INSTANT TRADING</span>
                     </div>
 
                     <!-- Buy / Sell Toggle Tabs -->
@@ -247,7 +261,7 @@
                     <!-- Shares Quantity Input -->
                     <div>
                         <label class="block text-xs font-bold text-slate-300 uppercase mb-1">Quantity (Shares):</label>
-                        <input id="order-shares" type="number" value="10" min="1" oninput="calculateOrderTotal()" class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-400 text-white rounded-xl px-4 py-3 text-sm focus:outline-none"/>
+                        <input id="order-shares" type="number" value="10" min="1" oninput="calculateOrderTotal()" class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-400 text-white rounded-xl px-4 py-3 text-sm focus:outline-none font-bold"/>
                     </div>
 
                     <!-- Calculated Summary -->
@@ -326,6 +340,7 @@
     <script>
         let currentSymbol = 'NVDA';
         let currentOrderType = 'BUY';
+        let currentTimeframe = '1H'; // Default 1H
         let chartInstance = null;
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -342,11 +357,42 @@
 
             refreshDashboard();
             initChart();
+
+            // REAL-TIME SECOND-BY-SECOND MARKET TICK LISTENER!
+            window.addEventListener('stockcraft_tick', (e) => {
+                const tick = e.detail;
+                if (tick.symbol === currentSymbol) {
+                    const priceEl = document.getElementById('active-price');
+                    priceEl.innerText = `${StockCraft.getState().currency}${tick.price.toFixed(2)}`;
+                    
+                    const changeEl = document.getElementById('active-change');
+                    changeEl.innerText = `${tick.changePercent} (${currentTimeframe})`;
+                    changeEl.className = `text-xs font-bold ${tick.change >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+
+                    const badge = document.getElementById('active-trend-badge');
+                    badge.innerText = tick.trendType;
+                    badge.className = `px-3 py-1 rounded-full text-xs font-bold border ${tick.trendType === 'INCREASING' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`;
+
+                    document.getElementById('order-share-price').innerText = `${StockCraft.getState().currency}${tick.price.toFixed(2)}`;
+                    calculateOrderTotal();
+
+                    // Update live chart dataset dynamically
+                    if (chartInstance && currentTimeframe === '1H') {
+                        chartInstance.data.datasets[0].data[chartInstance.data.datasets[0].data.length - 1] = tick.price;
+                        chartInstance.update('none'); // smooth update without full redraw
+                    }
+                }
+            });
         });
 
-        function refreshDashboard() {
+        // REFRESH DASHBOARD INSTANTLY (NO PAGE RELOAD NEEDED!)
+        window.refreshDashboard = function refreshDashboard() {
             const summary = StockCraft.getPortfolioSummary();
             const state = StockCraft.getState();
+
+            // Update Navbar cash balance instantly
+            const navDisp = document.getElementById('nav-cash-balance-display');
+            if (navDisp) navDisp.innerText = `${state.currency}${state.cash.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}`;
 
             // Update stats
             document.getElementById('stat-total-val').innerText = `${summary.currency}${summary.totalPortfolioValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
@@ -411,8 +457,34 @@
                 </tr>
             `).join('');
 
-            // Render AI Chat History
             renderAIChatHistory();
+        }
+
+        // FULLY INTERACTIVE TIMEFRAME SWITCHER (1H Ticks, 1D Daily, 30D Monthly, 1Y Yearly)
+        function setTimeframe(tf) {
+            currentTimeframe = tf;
+            const tfs = ['1H', '1D', '30D', '1Y'];
+            const titles = {
+                '1H': 'Live Market Resolution (1H Ticks)',
+                '1D': 'Daily Market Resolution (1D Ticks)',
+                '30D': '30-Day Historical Trend (30D Ticks)',
+                '1Y': '1-Year Annual Performance (1Y Ticks)'
+            };
+
+            tfs.forEach(t => {
+                const btn = document.getElementById(`tf-btn-${t}`);
+                if (btn) {
+                    if (t === tf) {
+                        btn.className = 'px-3 py-1.5 rounded-lg bg-emerald-500 text-slate-950 font-extrabold shadow transition-all';
+                    } else {
+                        btn.className = 'px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all';
+                    }
+                }
+            });
+
+            document.getElementById('timeframe-title-display').innerText = titles[tf] || titles['1H'];
+            const stock = StockCraft.getStock(currentSymbol);
+            updateChartForTimeframe(stock, tf);
         }
 
         function switchStock(symbol, redrawChart = true) {
@@ -426,7 +498,7 @@
             badge.className = `px-3 py-1 rounded-full text-xs font-bold border ${stock.trendType === 'INCREASING' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`;
 
             document.getElementById('active-price').innerText = `${state.currency}${stock.price.toFixed(2)}`;
-            document.getElementById('active-change').innerText = `${stock.changePercent} (Hourly)`;
+            document.getElementById('active-change').innerText = `${stock.changePercent} (${currentTimeframe})`;
             document.getElementById('active-ai-signal').innerText = stock.aiSignal;
             document.getElementById('active-ai-summary').innerText = stock.aiSummary;
 
@@ -436,7 +508,7 @@
             calculateOrderTotal();
 
             if (redrawChart && chartInstance) {
-                updateChartData(stock);
+                updateChartForTimeframe(stock, currentTimeframe);
             }
         }
 
@@ -467,6 +539,7 @@
             document.getElementById('order-total-price').innerText = `${state.currency}${total.toFixed(2)}`;
         }
 
+        // EXECUTE TRADE ORDER & REFRESH INSTANTLY WITHOUT REFRESHING PAGE!
         async function submitTradeOrder() {
             const shares = parseInt(document.getElementById('order-shares').value) || 0;
             let result;
@@ -479,6 +552,7 @@
 
             if (result && result.success) {
                 StockCraft.ui.showToast('Order Executed!', result.message, 'success');
+                // INSTANT AUTOMATIC UI UPDATE!
                 refreshDashboard();
             } else {
                 StockCraft.ui.showToast('Trade Failed', result ? result.message : 'Execution error', 'error');
@@ -500,7 +574,7 @@
             alert(`📄 OFFICIAL DIGITAL TRANSACTION RECEIPT\n-----------------------------------\nTransaction ID: ${txn.id}\nType: ${txn.type}\nAsset: ${txn.symbol}\nShares: ${txn.shares}\nExecution Price: ${state.currency}${txn.price.toFixed(2)}\nTotal Amount: ${state.currency}${txn.total.toFixed(2)}\nDate: ${new Date(txn.timestamp).toLocaleString()}\nStatus: ${txn.status}\n-----------------------------------\nVerified by StockCraft AI Trading Engine.`);
         }
 
-        // Hourly Chart Initialization
+        // Dynamic Multi-Timeframe Chart Initialization
         function initChart() {
             const ctx = document.getElementById('stockChart').getContext('2d');
             const stock = StockCraft.getStock(currentSymbol);
@@ -511,8 +585,8 @@
                     labels: stock.hourlyLabels,
                     datasets: [
                         {
-                            label: `${stock.symbol} Hourly Price`,
-                            data: stock.chartData,
+                            label: `${stock.symbol} Price`,
+                            data: stock.hourlyData,
                             borderColor: stock.trendType === 'INCREASING' ? '#10b981' : '#f43f5e',
                             backgroundColor: stock.trendType === 'INCREASING' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(244, 63, 94, 0.1)',
                             fill: true,
@@ -520,8 +594,8 @@
                             borderWidth: 3
                         },
                         {
-                            label: 'AI Hourly Forecast',
-                            data: [...stock.chartData.slice(0, 5), ...stock.chartData.slice(5).map(v => stock.trendType === 'INCREASING' ? v * 1.03 : v * 0.97)],
+                            label: 'AI Forecast Trend',
+                            data: stock.hourlyData.map((v, i) => i > 4 ? (stock.trendType === 'INCREASING' ? v * 1.03 : v * 0.97) : null),
                             borderColor: '#06b6d4',
                             borderDash: [5, 5],
                             borderWidth: 2,
@@ -543,12 +617,32 @@
             });
         }
 
-        function updateChartData(stock) {
-            chartInstance.data.labels = stock.hourlyLabels;
-            chartInstance.data.datasets[0].data = stock.chartData;
+        function updateChartForTimeframe(stock, tf) {
+            if (!chartInstance) return;
+
+            let labels = stock.hourlyLabels;
+            let data = stock.hourlyData;
+
+            if (tf === '1D') {
+                labels = stock.dailyLabels;
+                data = stock.dailyData;
+            } else if (tf === '30D') {
+                labels = stock.monthlyLabels;
+                data = stock.monthlyData;
+            } else if (tf === '1Y') {
+                labels = stock.yearlyLabels;
+                data = stock.yearlyData;
+            }
+
+            chartInstance.data.labels = labels;
+            chartInstance.data.datasets[0].data = data;
             chartInstance.data.datasets[0].borderColor = stock.trendType === 'INCREASING' ? '#10b981' : '#f43f5e';
             chartInstance.data.datasets[0].backgroundColor = stock.trendType === 'INCREASING' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(244, 63, 94, 0.1)';
-            chartInstance.data.datasets[1].data = [...stock.chartData.slice(0, 5), ...stock.chartData.slice(5).map(v => stock.trendType === 'INCREASING' ? v * 1.03 : v * 0.97)];
+            
+            // Forecast overlay line
+            const halfIdx = Math.floor(data.length / 2);
+            chartInstance.data.datasets[1].data = data.map((v, i) => i >= halfIdx ? (stock.trendType === 'INCREASING' ? v * 1.03 : v * 0.97) : null);
+            
             chartInstance.update();
         }
 

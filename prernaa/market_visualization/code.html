@@ -50,9 +50,9 @@
             <div>
                 <h1 class="text-3xl sm:text-4xl font-black font-headline text-white tracking-tight flex items-center gap-3">
                     <span class="material-symbols-outlined text-emerald-400 text-3xl">show_chart</span>
-                    <span>Hourly Market Chart Studio</span>
+                    <span>Interactive Market Chart Studio</span>
                 </h1>
-                <p class="text-slate-400 text-xs mt-1">Visualize hourly price ticks, moving averages, and AI trend forecasts for any stock asset.</p>
+                <p class="text-slate-400 text-xs mt-1">Visualize 1H, 1D, 30D, and 1Y price movements, SMA moving averages, and AI trend forecasts for any stock asset.</p>
             </div>
 
             <!-- Asset Selector & Control Buttons -->
@@ -71,23 +71,31 @@
         <div class="glass-panel p-6 rounded-3xl space-y-6">
             <!-- Studio Toolbar -->
             <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
-                <!-- Timeframes -->
-                <div class="flex gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs font-bold text-slate-400">
-                    <button class="px-3 py-1.5 rounded-lg bg-emerald-500 text-slate-950 font-extrabold">1 Hour Ticks</button>
-                    <button class="px-3 py-1.5 rounded-lg hover:text-white">4 Hours</button>
-                    <button class="px-3 py-1.5 rounded-lg hover:text-white">Daily</button>
-                    <button class="px-3 py-1.5 rounded-lg hover:text-white">Weekly</button>
+                <!-- Working Timeframe Switcher -->
+                <div class="flex gap-1.5 bg-slate-900 p-1.5 rounded-xl border border-slate-800 text-xs font-bold">
+                    <button id="st-btn-1H" onclick="setStudioTimeframe('1H')" class="px-3.5 py-1.5 rounded-lg bg-emerald-500 text-slate-950 font-extrabold shadow transition-all">
+                        1H Ticks
+                    </button>
+                    <button id="st-btn-1D" onclick="setStudioTimeframe('1D')" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all">
+                        1D (Daily)
+                    </button>
+                    <button id="st-btn-30D" onclick="setStudioTimeframe('30D')" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all">
+                        30D (Monthly)
+                    </button>
+                    <button id="st-btn-1Y" onclick="setStudioTimeframe('1Y')" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all">
+                        1Y (Yearly)
+                    </button>
                 </div>
 
                 <!-- Indicator Toggles -->
-                <div class="flex items-center gap-3 text-xs font-bold">
+                <div class="flex items-center gap-4 text-xs font-bold">
                     <label class="flex items-center gap-2 text-slate-300 cursor-pointer">
-                        <input type="checkbox" id="toggle-sma" checked onchange="toggleIndicator('sma')" class="rounded border-slate-700 text-emerald-500 focus:ring-0"/>
+                        <input type="checkbox" id="toggle-sma" checked onchange="toggleIndicator('sma')" class="rounded border-slate-700 text-amber-500 focus:ring-0"/>
                         <span>SMA Moving Avg</span>
                     </label>
                     <label class="flex items-center gap-2 text-slate-300 cursor-pointer">
                         <input type="checkbox" id="toggle-ai" checked onchange="toggleIndicator('ai')" class="rounded border-slate-700 text-cyan-500 focus:ring-0"/>
-                        <span>AI Hourly Forecast</span>
+                        <span>AI Forecast Overlay</span>
                     </label>
                 </div>
             </div>
@@ -105,6 +113,7 @@
     <script>
         let studioChart = null;
         let activeSymbol = 'NVDA';
+        let activeStudioTimeframe = '1H';
 
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('navbar-mount').innerHTML = StockCraft.renderNavbar('charts');
@@ -115,7 +124,29 @@
             select.value = activeSymbol;
 
             renderStudioChart(activeSymbol);
+
+            // REAL-TIME TICK LISTENER IN CHART STUDIO
+            window.addEventListener('stockcraft_tick', (e) => {
+                const tick = e.detail;
+                if (tick.symbol === activeSymbol && studioChart && activeStudioTimeframe === '1H') {
+                    studioChart.data.datasets[0].data[studioChart.data.datasets[0].data.length - 1] = tick.price;
+                    studioChart.update('none');
+                }
+            });
         });
+
+        function setStudioTimeframe(tf) {
+            activeStudioTimeframe = tf;
+            ['1H', '1D', '30D', '1Y'].forEach(t => {
+                const btn = document.getElementById(`st-btn-${t}`);
+                if (btn) {
+                    btn.className = t === tf 
+                        ? 'px-3.5 py-1.5 rounded-lg bg-emerald-500 text-slate-950 font-extrabold shadow transition-all'
+                        : 'px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all';
+                }
+            });
+            renderStudioChart(activeSymbol);
+        }
 
         function renderStudioChart(symbol) {
             activeSymbol = symbol;
@@ -124,17 +155,32 @@
 
             if (studioChart) studioChart.destroy();
 
-            const smaData = stock.chartData.map((v, i) => v * (1 - (0.01 * (i % 3))));
-            const aiData = stock.chartData.map((v, i) => i > 4 ? (stock.trendType === 'INCREASING' ? v * 1.03 : v * 0.97) : null);
+            let labels = stock.hourlyLabels;
+            let data = stock.hourlyData;
+
+            if (activeStudioTimeframe === '1D') {
+                labels = stock.dailyLabels;
+                data = stock.dailyData;
+            } else if (activeStudioTimeframe === '30D') {
+                labels = stock.monthlyLabels;
+                data = stock.monthlyData;
+            } else if (activeStudioTimeframe === '1Y') {
+                labels = stock.yearlyLabels;
+                data = stock.yearlyData;
+            }
+
+            const smaData = data.map((v, i) => v * (1 - (0.01 * (i % 3))));
+            const halfIdx = Math.floor(data.length / 2);
+            const aiData = data.map((v, i) => i >= halfIdx ? (stock.trendType === 'INCREASING' ? v * 1.03 : v * 0.97) : null);
 
             studioChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: stock.hourlyLabels,
+                    labels: labels,
                     datasets: [
                         {
-                            label: `${stock.symbol} Hourly Price`,
-                            data: stock.chartData,
+                            label: `${stock.symbol} Price`,
+                            data: data,
                             borderColor: stock.trendType === 'INCREASING' ? '#10b981' : '#f43f5e',
                             backgroundColor: stock.trendType === 'INCREASING' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(244, 63, 94, 0.1)',
                             fill: true,
@@ -150,7 +196,7 @@
                             fill: false
                         },
                         {
-                            label: 'AI Hourly Forecast',
+                            label: 'AI Forecast Overlay',
                             data: aiData,
                             borderColor: '#06b6d4',
                             borderDash: [6, 6],
