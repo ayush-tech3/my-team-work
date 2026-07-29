@@ -5,7 +5,7 @@
 ---
 
 ## 🌐 Live Demo & Deployment
-- 🚀 **Live Web App (Netlify)**: [http://elegant-dango-6bcba8.netlify.app](http://elegant-dango-6bcba8.netlify.app)
+- 🚀 **Live Web App (Netlify)**: [https://magenta-donut-814206.netlify.app/](https://magenta-donut-814206.netlify.app/)
 - 🐙 **GitHub Repository**: [https://github.com/ayush-tech3/my-team-work](https://github.com/ayush-tech3/my-team-work)
 
 ---
