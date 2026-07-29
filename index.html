@@ -44,7 +44,7 @@
     <style>
         .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 400; }
         .glass-panel {
-            background: rgba(15, 23, 42, 0.7);
+            background: rgba(15, 23, 42, 0.75);
             backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
@@ -55,7 +55,7 @@
 </head>
 <body class="bg-slate-950 font-body text-slate-100 min-h-screen selection:bg-emerald-500 selection:text-slate-950">
 
-    <!-- Global Navigation -->
+    <!-- Global Navigation with Top-Right Auth Controls -->
     <div id="navbar-mount"></div>
 
     <main class="pt-16">
@@ -80,24 +80,18 @@
                         </h1>
 
                         <p class="text-lg text-slate-300 max-w-2xl leading-relaxed">
-                            Confused about what to buy or how to start? **StockCraft AI** teaches you step-by-step how stocks work, analyzes market trends in plain English, and lets you practice buying & selling with **$25,000 in virtual paper cash** before spending real money.
+                            Confused about what to buy or how to start? **StockCraft AI** teaches you step-by-step how stocks work, analyzes market trends in plain English, and lets you practice buying & selling with **$25,000 in virtual paper cash**.
                         </p>
 
-                        <div class="flex flex-wrap items-center gap-4 pt-2">
-                            <a href="/prernaa/user_dashboard/code.html" class="px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 rounded-2xl font-headline font-extrabold text-base shadow-xl shadow-emerald-500/25 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2">
-                                <span class="material-symbols-outlined">rocket_launch</span>
-                                <span>Launch Trading Simulator ($25K Cash)</span>
-                            </a>
-                            <a href="/prernaa/solutions_page/code.html" class="px-7 py-4 bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 rounded-2xl font-headline font-bold text-base hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2">
-                                <span class="material-symbols-outlined">school</span>
-                                <span>Beginner Academy ("How To")</span>
-                            </a>
+                        <!-- CTA Actions based on Login State -->
+                        <div class="flex flex-wrap items-center gap-4 pt-2" id="hero-actions-container">
+                            <!-- Populated dynamically based on Auth State -->
                         </div>
 
                         <div class="pt-4 flex items-center gap-6 text-xs text-slate-400">
                             <div class="flex items-center gap-1.5">
                                 <span class="material-symbols-outlined text-emerald-400 text-base">check_circle</span>
-                                <span>100% Free Paper Trading</span>
+                                <span>100% Risk-Free Trading</span>
                             </div>
                             <div class="flex items-center gap-1.5">
                                 <span class="material-symbols-outlined text-emerald-400 text-base">check_circle</span>
@@ -105,12 +99,12 @@
                             </div>
                             <div class="flex items-center gap-1.5">
                                 <span class="material-symbols-outlined text-emerald-400 text-base">check_circle</span>
-                                <span>No Credit Card Required</span>
+                                <span>Free Registration</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Live AI Spotlight Card -->
+                    <!-- Spotlight Hero Card -->
                     <div class="lg:col-span-5">
                         <div class="glass-panel p-6 rounded-3xl relative shadow-2xl border-emerald-500/20">
                             <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
@@ -139,7 +133,7 @@
                                     </span>
                                 </div>
 
-                                <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800/80 space-y-2">
+                                <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-2">
                                     <div class="flex items-center gap-2 text-emerald-400 text-xs font-bold">
                                         <span class="material-symbols-outlined text-sm">auto_awesome</span>
                                         StockBuddy AI Insight:
@@ -149,11 +143,10 @@
                                     </p>
                                 </div>
 
-                                <!-- Quick Buy Button -->
-                                <button onclick="quickBuyModal('SPY')" class="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-headline font-extrabold text-sm rounded-xl shadow-lg shadow-emerald-500/20 active:scale-95 transition-all flex items-center justify-center gap-2">
-                                    <span class="material-symbols-outlined">shopping_cart</span>
-                                    <span>Execute Practice Buy ($552.10)</span>
-                                </button>
+                                <!-- Dynamic Auth-Gated Button -->
+                                <div id="hero-spotlight-btn-container">
+                                    <!-- Populated dynamically -->
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -162,68 +155,69 @@
             </div>
         </section>
 
-        <!-- Beginner Guided 3-Step Flow ("What Should I Do?") -->
-        <section class="py-16 bg-slate-900/50 border-y border-slate-800/60">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center max-w-2xl mx-auto mb-12">
-                    <h2 class="text-3xl font-extrabold font-headline text-white tracking-tight">
-                        New to Investing? <span class="text-emerald-400">Here is What To Do</span>
-                    </h2>
-                    <p class="text-slate-400 text-sm mt-2">Follow our 3-step beginner road map to make your first confident stock move.</p>
+        <!-- Dynamic Auth Gated Content Area -->
+        <div id="logged-in-content" class="space-y-16">
+            <!-- Beginner Guided 3-Step Flow -->
+            <section class="py-16 bg-slate-900/50 border-y border-slate-800/60">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center max-w-2xl mx-auto mb-12">
+                        <h2 class="text-3xl font-extrabold font-headline text-white tracking-tight">
+                            New to Investing? <span class="text-emerald-400">Here is What To Do</span>
+                        </h2>
+                        <p class="text-slate-400 text-sm mt-2">Follow our 3-step beginner road map to make your first confident stock move.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Step 1 -->
+                        <div class="glass-panel p-8 rounded-2xl relative group hover:border-emerald-500/40 transition-all">
+                            <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 font-headline font-black text-xl flex items-center justify-center mb-6">
+                                01
+                            </div>
+                            <h3 class="text-xl font-bold font-headline text-white mb-2">Learn How Stocks Work</h3>
+                            <p class="text-slate-300 text-xs leading-relaxed mb-6">
+                                Understand what shares are, how market prices move up & down, and what order types mean (Market vs Limit).
+                            </p>
+                            <a href="/prernaa/solutions_page/code.html" class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 hover:text-emerald-300">
+                                <span>Open Beginner Academy</span>
+                                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            </a>
+                        </div>
+
+                        <!-- Step 2 -->
+                        <div class="glass-panel p-8 rounded-2xl relative group hover:border-emerald-500/40 transition-all">
+                            <div class="w-12 h-12 rounded-xl bg-cyan-500/10 text-cyan-400 font-headline font-black text-xl flex items-center justify-center mb-6">
+                                02
+                            </div>
+                            <h3 class="text-xl font-bold font-headline text-white mb-2">Consult StockBuddy AI</h3>
+                            <p class="text-slate-300 text-xs leading-relaxed mb-6">
+                                Ask our AI assistant about any company. Get simple risk scores, pros & cons, and target price projections in seconds.
+                            </p>
+                            <a href="/prernaa/market_intelligence/code.html" class="inline-flex items-center gap-1.5 text-xs font-bold text-cyan-400 hover:text-cyan-300">
+                                <span>Ask AI Assistant</span>
+                                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            </a>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div class="glass-panel p-8 rounded-2xl relative group hover:border-emerald-500/40 transition-all">
+                            <div class="w-12 h-12 rounded-xl bg-teal-500/10 text-teal-400 font-headline font-black text-xl flex items-center justify-center mb-6">
+                                03
+                            </div>
+                            <h3 class="text-xl font-bold font-headline text-white mb-2">Place Practice Purchase</h3>
+                            <p class="text-slate-300 text-xs leading-relaxed mb-6">
+                                Use your $25,000 virtual cash balance to buy shares in the trading simulator. Track your portfolio profit & loss in real time!
+                            </p>
+                            <a href="/prernaa/user_dashboard/code.html" class="inline-flex items-center gap-1.5 text-xs font-bold text-teal-400 hover:text-teal-300">
+                                <span>Go to Dashboard</span>
+                                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            </a>
+                        </div>
+                    </div>
                 </div>
+            </section>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <!-- Step 1 -->
-                    <div class="glass-panel p-8 rounded-2xl relative group hover:border-emerald-500/40 transition-all">
-                        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 font-headline font-black text-xl flex items-center justify-center mb-6">
-                            01
-                        </div>
-                        <h3 class="text-xl font-bold font-headline text-white mb-2">Learn How Stocks Work</h3>
-                        <p class="text-slate-300 text-xs leading-relaxed mb-6">
-                            Understand what shares are, how market prices move up & down, and what order types mean (Market vs Limit).
-                        </p>
-                        <a href="/prernaa/solutions_page/code.html" class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 hover:text-emerald-300">
-                            <span>Open Beginner Academy</span>
-                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                        </a>
-                    </div>
-
-                    <!-- Step 2 -->
-                    <div class="glass-panel p-8 rounded-2xl relative group hover:border-emerald-500/40 transition-all">
-                        <div class="w-12 h-12 rounded-xl bg-cyan-500/10 text-cyan-400 font-headline font-black text-xl flex items-center justify-center mb-6">
-                            02
-                        </div>
-                        <h3 class="text-xl font-bold font-headline text-white mb-2">Consult StockBuddy AI</h3>
-                        <p class="text-slate-300 text-xs leading-relaxed mb-6">
-                            Ask our AI assistant about any company. Get simple risk scores, pros & cons, and target price projections in seconds.
-                        </p>
-                        <a href="/prernaa/market_intelligence/code.html" class="inline-flex items-center gap-1.5 text-xs font-bold text-cyan-400 hover:text-cyan-300">
-                            <span>Ask AI Assistant</span>
-                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                        </a>
-                    </div>
-
-                    <!-- Step 3 -->
-                    <div class="glass-panel p-8 rounded-2xl relative group hover:border-emerald-500/40 transition-all">
-                        <div class="w-12 h-12 rounded-xl bg-teal-500/10 text-teal-400 font-headline font-black text-xl flex items-center justify-center mb-6">
-                            03
-                        </div>
-                        <h3 class="text-xl font-bold font-headline text-white mb-2">Place Practice Purchase</h3>
-                        <p class="text-slate-300 text-xs leading-relaxed mb-6">
-                            Use your $25,000 virtual cash balance to buy shares in the trading simulator. Track your portfolio profit & loss in real time!
-                        </p>
-                        <a href="/prernaa/user_dashboard/code.html" class="inline-flex items-center gap-1.5 text-xs font-bold text-teal-400 hover:text-teal-300">
-                            <span>Go to Dashboard</span>
-                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Stock Screener & Practice Market Cards -->
-        <section class="py-20">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Stock Screener & Practice Market Cards -->
+            <section class="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
                     <div>
                         <h2 class="text-3xl font-extrabold font-headline text-white">
@@ -237,48 +231,38 @@
                     </a>
                 </div>
 
-                <!-- Stock Cards Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="stock-screener-grid">
-                    <!-- Populated dynamically by JS -->
+                    <!-- Populated dynamically -->
+                </div>
+            </section>
+        </div>
+
+        <!-- Non-Logged In Auth Teaser Box -->
+        <div id="logged-out-teaser" class="hidden py-16 bg-slate-900/40 border-y border-slate-800/80">
+            <div class="max-w-4xl mx-auto px-4 text-center space-y-6">
+                <div class="w-14 h-14 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold mx-auto">
+                    <span class="material-symbols-outlined text-3xl">lock</span>
+                </div>
+                <h2 class="text-3xl font-black font-headline text-white">Sign In or Register to Unlock Full Platform</h2>
+                <p class="text-slate-300 text-sm max-w-xl mx-auto leading-relaxed">
+                    Create a free trader account to claim your **$25,000 Virtual Paper Trading Wallet**, save stock positions, and get personalized AI recommendations.
+                </p>
+                <div class="flex items-center justify-center gap-4 pt-2">
+                    <a href="/prernaa/authentication/code.html" class="px-8 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 text-slate-950 font-headline font-extrabold text-sm rounded-xl shadow-xl shadow-emerald-500/20 transition-all">
+                        Sign In Now
+                    </a>
+                    <a href="/prernaa/authentication/code.html?mode=register" class="px-8 py-3.5 bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 font-headline font-bold text-sm rounded-xl transition-all">
+                        Create Free Account
+                    </a>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <!-- Interactive AI Chat Widget Section -->
-        <section class="py-16 bg-slate-900/60 border-t border-slate-800">
-            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="glass-panel p-8 rounded-3xl border-emerald-500/20">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-cyan-500 flex items-center justify-center text-slate-950 font-black">
-                            <span class="material-symbols-outlined text-2xl">auto_awesome</span>
-                        </div>
-                        <div>
-                            <h3 class="text-2xl font-bold font-headline text-white">Ask StockBuddy AI Anything</h3>
-                            <p class="text-xs text-slate-400">Get plain-English answers for any stock market question.</p>
-                        </div>
-                    </div>
-
-                    <!-- AI Output Box -->
-                    <div id="ai-home-output" class="bg-slate-950/80 p-6 rounded-2xl border border-slate-800 min-h-[140px] mb-4 text-sm text-slate-200 leading-relaxed font-body">
-                        👋 Hi! Type a question below, or try asking: *"Is Apple a good stock for beginners?"* or *"What is P/E Ratio?"*
-                    </div>
-
-                    <!-- Input Box -->
-                    <form onsubmit="handleHomeAISubmit(event)" class="flex gap-3">
-                        <input id="ai-home-input" type="text" placeholder="Type your stock question here..." class="flex-1 bg-slate-900 border border-slate-700 focus:border-emerald-400 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none transition-colors"/>
-                        <button type="submit" class="px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-headline font-bold text-sm rounded-xl transition-all flex items-center gap-1.5">
-                            <span>Ask AI</span>
-                            <span class="material-symbols-outlined text-base">send</span>
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </section>
     </main>
 
     <!-- Purchase Modal -->
     <div id="purchase-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-        <div class="glass-panel max-w-lg w-full p-6 rounded-3xl border-emerald-500/30 shadow-2xl relative animate-fade-in-up">
+        <div class="glass-panel max-w-lg w-full p-6 rounded-3xl border-emerald-500/30 shadow-2xl relative">
             <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
                 <span class="material-symbols-outlined">close</span>
             </button>
@@ -290,64 +274,105 @@
     <script src="./prernaa/stock_engine.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Mount Navbar & Ticker
+            // Render Top Navbar & Ticker Tape
             document.getElementById('navbar-mount').innerHTML = StockCraft.renderNavbar('home');
             document.getElementById('ticker-mount').innerHTML = StockCraft.renderTickerTape();
 
-            // Populate Stock Screener Grid
-            const stocks = StockCraft.getStocks();
-            const grid = document.getElementById('stock-screener-grid');
-            const state = StockCraft.getState();
+            const loggedIn = StockCraft.isLoggedIn();
+            const heroActions = document.getElementById('hero-actions-container');
+            const spotlightContainer = document.getElementById('hero-spotlight-btn-container');
 
-            grid.innerHTML = stocks.slice(0, 8).map(s => `
-                <div class="glass-panel p-5 rounded-2xl hover:border-emerald-500/40 transition-all flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="font-headline font-black text-lg text-white">${s.symbol}</span>
-                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/20">
-                                ${s.riskLevel}
-                            </span>
-                        </div>
-                        <h4 class="font-headline font-bold text-sm text-slate-200 mb-1 line-clamp-1">${s.name}</h4>
-                        <p class="text-xs text-slate-400 mb-4">${s.sector}</p>
+            if (loggedIn) {
+                document.getElementById('logged-in-content').classList.remove('hidden');
+                document.getElementById('logged-out-teaser').classList.add('hidden');
 
-                        <div class="flex justify-between items-baseline mb-4">
-                            <span class="text-xl font-bold font-headline text-white">${state.currency}${s.price.toFixed(2)}</span>
-                            <span class="${s.change >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-bold text-xs">
-                                ${s.changePercent}
-                            </span>
-                        </div>
+                heroActions.innerHTML = `
+                    <a href="/prernaa/user_dashboard/code.html" class="px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 rounded-2xl font-headline font-extrabold text-base shadow-xl shadow-emerald-500/25 transition-all flex items-center gap-2">
+                        <span class="material-symbols-outlined">rocket_launch</span>
+                        <span>Open Trading Dashboard</span>
+                    </a>
+                    <a href="/prernaa/solutions_page/code.html" class="px-7 py-4 bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 rounded-2xl font-headline font-bold text-base transition-all flex items-center gap-2">
+                        <span class="material-symbols-outlined">school</span>
+                        <span>Beginner Academy</span>
+                    </a>
+                `;
 
-                        <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/80 mb-4">
-                            <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block mb-1">AI Recommendation</span>
-                            <p class="text-xs text-slate-300 font-medium">${s.aiSignal} (${s.aiScore}/100)</p>
-                        </div>
-                    </div>
-
-                    <button onclick="quickBuyModal('${s.symbol}')" class="w-full py-2.5 bg-slate-800 hover:bg-emerald-500 text-slate-200 hover:text-slate-950 font-headline font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5">
-                        <span class="material-symbols-outlined text-sm">shopping_cart</span>
-                        <span>Practice Purchase</span>
+                spotlightContainer.innerHTML = `
+                    <button onclick="quickBuyModal('SPY')" class="w-full py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-headline font-extrabold text-sm rounded-xl shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">shopping_cart</span>
+                        <span>Execute Practice Buy ($552.10)</span>
                     </button>
-                </div>
-            `).join('');
+                `;
+
+                // Populate Screener Grid
+                const stocks = StockCraft.getStocks();
+                const grid = document.getElementById('stock-screener-grid');
+                const state = StockCraft.getState();
+
+                grid.innerHTML = stocks.slice(0, 8).map(s => `
+                    <div class="glass-panel p-5 rounded-2xl hover:border-emerald-500/40 transition-all flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="font-headline font-black text-lg text-white">${s.symbol}</span>
+                                <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-bold border border-emerald-500/20">
+                                    ${s.riskLevel}
+                                </span>
+                            </div>
+                            <h4 class="font-headline font-bold text-sm text-slate-200 mb-1 line-clamp-1">${s.name}</h4>
+                            <p class="text-xs text-slate-400 mb-4">${s.sector}</p>
+
+                            <div class="flex justify-between items-baseline mb-4">
+                                <span class="text-xl font-bold font-headline text-white">${state.currency}${s.price.toFixed(2)}</span>
+                                <span class="${s.change >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-bold text-xs">
+                                    ${s.changePercent}
+                                </span>
+                            </div>
+
+                            <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/80 mb-4">
+                                <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block mb-1">AI Recommendation</span>
+                                <p class="text-xs text-slate-300 font-medium">${s.aiSignal} (${s.aiScore}/100)</p>
+                            </div>
+                        </div>
+
+                        <button onclick="quickBuyModal('${s.symbol}')" class="w-full py-2.5 bg-slate-800 hover:bg-emerald-500 text-slate-200 hover:text-slate-950 font-headline font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5">
+                            <span class="material-symbols-outlined text-sm">shopping_cart</span>
+                            <span>Practice Purchase</span>
+                        </button>
+                    </div>
+                `).join('');
+
+            } else {
+                // NOT LOGGED IN FRONTEND STATE
+                document.getElementById('logged-in-content').classList.add('hidden');
+                document.getElementById('logged-out-teaser').classList.remove('hidden');
+
+                heroActions.innerHTML = `
+                    <a href="/prernaa/authentication/code.html" class="px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 text-slate-950 rounded-2xl font-headline font-extrabold text-base shadow-xl shadow-emerald-500/25 transition-all flex items-center gap-2">
+                        <span class="material-symbols-outlined">login</span>
+                        <span>Sign In / Register to Access Platform</span>
+                    </a>
+                    <a href="/prernaa/solutions_page/code.html" class="px-7 py-4 bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-slate-700/80 rounded-2xl font-headline font-bold text-base transition-all flex items-center gap-2">
+                        <span class="material-symbols-outlined">school</span>
+                        <span>Preview Beginner Lessons</span>
+                    </a>
+                `;
+
+                spotlightContainer.innerHTML = `
+                    <a href="/prernaa/authentication/code.html" class="w-full py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-headline font-extrabold text-sm rounded-xl shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">lock</span>
+                        <span>Sign In to Purchase Shares</span>
+                    </a>
+                `;
+            }
         });
 
-        function handleHomeAISubmit(e) {
-            e.preventDefault();
-            const input = document.getElementById('ai-home-input');
-            const output = document.getElementById('ai-home-output');
-            const val = input.value.trim();
-            if (!val) return;
-
-            output.innerHTML = `<div class="flex items-center gap-2 text-emerald-400"><span class="material-symbols-outlined animate-spin text-sm">sync</span> Analyzing market database with StockBuddy AI...</div>`;
-            setTimeout(() => {
-                const response = StockCraft.askAI(val);
-                output.innerHTML = response.replace(/\n/g, '<br/>');
-                input.value = '';
-            }, 600);
-        }
-
         function quickBuyModal(symbol) {
+            if (!StockCraft.isLoggedIn()) {
+                StockCraft.ui.showToast('Sign In Required', 'Please Sign In or Register to place practice buy orders.', 'error');
+                setTimeout(() => window.location.href = '/prernaa/authentication/code.html', 1200);
+                return;
+            }
+
             const stock = StockCraft.getStock(symbol);
             const state = StockCraft.getState();
             const modal = document.getElementById('purchase-modal');
@@ -386,7 +411,7 @@
                         <span class="text-2xl font-black font-headline text-emerald-400" id="modal-total-cost">${state.currency}${(stock.price * 5).toFixed(2)}</span>
                     </div>
 
-                    <button onclick="executeQuickBuy('${stock.symbol}')" class="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-headline font-extrabold text-sm rounded-xl shadow-lg shadow-emerald-500/20 active:scale-95 transition-all">
+                    <button onclick="executeQuickBuy('${stock.symbol}')" class="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 text-slate-950 font-headline font-extrabold text-sm rounded-xl shadow-lg shadow-emerald-500/20 transition-all">
                         Confirm Practice Stock Purchase
                     </button>
                 </div>
@@ -400,15 +425,16 @@
             document.getElementById('modal-total-cost').innerText = `${state.currency}${(price * shares).toFixed(2)}`;
         }
 
-        function executeQuickBuy(symbol) {
+        async function executeQuickBuy(symbol) {
             const shares = parseInt(document.getElementById('modal-shares-input').value) || 0;
-            const res = StockCraft.buyStock(symbol, shares);
+            const res = await StockCraft.buyStock(symbol, shares);
             closeModal();
-            if (res.success) {
+
+            if (res && res.success) {
                 StockCraft.ui.showToast('Order Executed!', res.message, 'success');
                 setTimeout(() => window.location.href = '/prernaa/user_dashboard/code.html', 1200);
             } else {
-                StockCraft.ui.showToast('Order Failed', res.message, 'error');
+                StockCraft.ui.showToast('Order Failed', res ? res.message : 'Execution failed', 'error');
             }
         }
 

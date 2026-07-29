@@ -183,7 +183,7 @@ window.StockCraft = (function () {
             currency: '$',
             cash: 25000.00,
             plan: 'Free Learner',
-            name: 'Guest Trader',
+            name: 'Demo Trader',
             portfolio: [
                 { symbol: 'SPY', shares: 10, avgPrice: 535.00 },
                 { symbol: 'AAPL', shares: 15, avgPrice: 215.00 }
@@ -222,7 +222,8 @@ window.StockCraft = (function () {
             const opts = { method, headers };
             if (data) opts.body = JSON.stringify(data);
             const res = await fetch(API_BASE + endpoint, opts);
-            return await res.json();
+            const json = await res.json();
+            return json;
         } catch (e) {
             console.warn('Backend API connection offline, using client fallback', e);
             return null;
@@ -230,6 +231,10 @@ window.StockCraft = (function () {
     }
 
     return {
+        isLoggedIn: function () {
+            return !!localStorage.getItem(TOKEN_KEY);
+        },
+
         getToken: function () {
             return localStorage.getItem(TOKEN_KEY);
         },
@@ -262,11 +267,12 @@ window.StockCraft = (function () {
             } else if (res && res.error) {
                 return { success: false, message: res.error };
             }
-            // Fallback
+            // Fallback: auto login demo
             const st = getLocalState();
             st.name = name;
             st.currency = currency || '$';
             saveLocalState(st);
+            localStorage.setItem(TOKEN_KEY, 'demo_token_' + Date.now());
             return { success: true, user: st };
         },
 
@@ -285,12 +291,19 @@ window.StockCraft = (function () {
             } else if (res && res.error) {
                 return { success: false, message: res.error };
             }
-            return { success: false, message: 'Invalid credentials or connection error' };
+
+            // Fallback for demo credentials
+            if (email === 'trader@stockcraft.ai' || email.includes('@')) {
+                localStorage.setItem(TOKEN_KEY, 'demo_token_' + Date.now());
+                const st = getLocalState();
+                return { success: true, user: st };
+            }
+            return { success: false, message: 'Invalid credentials' };
         },
 
         logout: function () {
             localStorage.removeItem(TOKEN_KEY);
-            window.location.reload();
+            window.location.href = '/index.html';
         },
 
         // --- WALLET & ADD MONEY OPTION ---
@@ -309,7 +322,7 @@ window.StockCraft = (function () {
                 return { success: true, message: res.message, newCash: res.newCash, receipt: res.receipt };
             }
 
-            // Local Engine Fallback
+            // Local Fallback
             const st = getLocalState();
             st.cash += amount;
             const txn = {
@@ -336,7 +349,16 @@ window.StockCraft = (function () {
         // --- PURCHASE STOCK SIMULATOR ---
         buyStock: async function (symbol, shares) {
             shares = parseInt(shares);
-            if (isNaN(shares) || shares <= 0) return { success: false, message: 'Invalid number of shares.' };
+            if (isNaN(shares) || shares <= 0) {
+                return { success: false, message: 'Please enter a valid number of shares.' };
+            }
+
+            if (!this.isLoggedIn()) {
+                return {
+                    success: false,
+                    message: '🔒 Authentication Required! Please Sign In or Register to execute stock purchases.'
+                };
+            }
 
             const res = await apiCall('/api/trade/buy', 'POST', { symbol, shares });
             if (res && res.success) {
@@ -358,7 +380,7 @@ window.StockCraft = (function () {
             if (st.cash < total) {
                 return {
                     success: false,
-                    message: `Insufficient Funds! Total cost is ${st.currency}${total.toFixed(2)}, but you only have ${st.currency}${st.cash.toFixed(2)}. Click "Add Money" to deposit funds.`
+                    message: `Insufficient Funds! Total cost is ${st.currency}${total.toFixed(2)}, but available balance is ${st.currency}${st.cash.toFixed(2)}. Click "Add Money" to deposit funds.`
                 };
             }
 
@@ -390,7 +412,16 @@ window.StockCraft = (function () {
 
         sellStock: async function (symbol, shares) {
             shares = parseInt(shares);
-            if (isNaN(shares) || shares <= 0) return { success: false, message: 'Invalid number of shares.' };
+            if (isNaN(shares) || shares <= 0) {
+                return { success: false, message: 'Please enter a valid number of shares.' };
+            }
+
+            if (!this.isLoggedIn()) {
+                return {
+                    success: false,
+                    message: '🔒 Authentication Required! Please Sign In or Register to execute stock sales.'
+                };
+            }
 
             const res = await apiCall('/api/trade/sell', 'POST', { symbol, shares });
             if (res && res.success) {
@@ -410,7 +441,7 @@ window.StockCraft = (function () {
             const idx = st.portfolio.findIndex(p => p.symbol === stock.symbol);
 
             if (idx < 0 || st.portfolio[idx].shares < shares) {
-                return { success: false, message: `Insufficient position in ${symbol}.` };
+                return { success: false, message: `Insufficient position. You own ${idx >= 0 ? st.portfolio[idx].shares : 0} shares of ${symbol}.` };
             }
 
             const payout = stock.price * shares;
@@ -519,10 +550,10 @@ window.StockCraft = (function () {
             return responseText;
         },
 
-        // Dynamic Header Navigation Renderer with Login Status & Add Money Modal Launcher
+        // Clean Header Navigation with Top-Right Auth Gating & Add Money Launcher
         renderNavbar: function (activePage = 'home') {
             const state = getLocalState();
-            const isLoggedIn = !!localStorage.getItem(TOKEN_KEY);
+            const loggedIn = this.isLoggedIn();
 
             const links = [
                 { name: 'Home', url: '/index.html', key: 'home', icon: 'home' },
@@ -544,15 +575,41 @@ window.StockCraft = (function () {
                 </a>`;
             }).join('');
 
-            const authBtn = isLoggedIn
-                ? `<button onclick="StockCraft.logout()" class="px-3 py-1.5 bg-slate-800 hover:bg-rose-500/20 text-rose-300 text-xs font-bold rounded-xl border border-slate-700 transition-all flex items-center gap-1">
-                    <span class="material-symbols-outlined text-sm">logout</span>
-                    <span>Logout</span>
-                   </button>`
-                : `<a href="/prernaa/authentication/code.html" class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl border border-slate-700 transition-all flex items-center gap-1">
-                    <span class="material-symbols-outlined text-sm">login</span>
-                    <span>Sign In</span>
-                   </a>`;
+            // TOP-RIGHT CORNER AUTHENTICATION CONTROL
+            let topRightControls = '';
+            if (loggedIn) {
+                topRightControls = `
+                <div class="flex items-center gap-2.5">
+                    <button onclick="StockCraft.ui.openAddMoneyModal()" class="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold rounded-xl flex items-center gap-1 transition-all active:scale-95">
+                        <span class="material-symbols-outlined text-base">add_circle</span>
+                        <span>Add Money</span>
+                    </button>
+
+                    <a href="/prernaa/user_dashboard/code.html" class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 rounded-xl font-headline font-bold text-xs shadow-lg shadow-emerald-500/20 active:scale-95 transition-all">
+                        <span class="material-symbols-outlined text-base">account_balance_wallet</span>
+                        <span>${state.currency}${state.cash.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>
+                    </a>
+
+                    <button onclick="StockCraft.logout()" class="px-3 py-1.5 bg-slate-800 hover:bg-rose-500/20 text-rose-300 text-xs font-bold rounded-xl border border-slate-700 transition-all flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">logout</span>
+                        <span>Logout</span>
+                    </button>
+                </div>
+                `;
+            } else {
+                topRightControls = `
+                <div class="flex items-center gap-2">
+                    <a href="/prernaa/authentication/code.html" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700/80 text-xs font-headline font-bold rounded-xl transition-all flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">login</span>
+                        <span>Sign In</span>
+                    </a>
+                    <a href="/prernaa/authentication/code.html?mode=register" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-headline font-extrabold text-xs rounded-xl shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">person_add</span>
+                        <span>Sign Up</span>
+                    </a>
+                </div>
+                `;
+            }
 
             return `
             <nav class="fixed top-0 left-0 w-full z-50 bg-slate-950/90 backdrop-blur-xl border-b border-slate-800 shadow-2xl">
@@ -568,20 +625,7 @@ window.StockCraft = (function () {
                         ${navItems}
                     </div>
 
-                    <div class="flex items-center gap-2.5">
-                        <!-- Add Money Button -->
-                        <button onclick="StockCraft.ui.openAddMoneyModal()" class="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold rounded-xl flex items-center gap-1 transition-all active:scale-95">
-                            <span class="material-symbols-outlined text-base">add_circle</span>
-                            <span>Add Money</span>
-                        </button>
-
-                        <a href="/prernaa/user_dashboard/code.html" class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 rounded-xl font-headline font-bold text-xs shadow-lg shadow-emerald-500/20 active:scale-95 transition-all">
-                            <span class="material-symbols-outlined text-base">account_balance_wallet</span>
-                            <span>${state.currency}${state.cash.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>
-                        </a>
-
-                        ${authBtn}
-                    </div>
+                    ${topRightControls}
                 </div>
             </nav>
 
@@ -661,6 +705,11 @@ window.StockCraft = (function () {
 
         ui: {
             openAddMoneyModal: function () {
+                if (!window.StockCraft.isLoggedIn()) {
+                    window.StockCraft.ui.showToast('Authentication Required', 'Please Sign In or Register to deposit funds into your wallet.', 'error');
+                    setTimeout(() => window.location.href = '/prernaa/authentication/code.html', 1200);
+                    return;
+                }
                 document.getElementById('global-add-money-modal').classList.remove('hidden');
             },
 
@@ -698,10 +747,10 @@ async function executeWalletDeposit() {
     const res = await StockCraft.addMoney(amt, method);
     StockCraft.ui.closeAddMoneyModal();
 
-    if (res.success) {
+    if (res && res.success) {
         StockCraft.ui.showToast('Money Added!', res.message, 'success');
         setTimeout(() => window.location.reload(), 1200);
     } else {
-        StockCraft.ui.showToast('Deposit Failed', res.message, 'error');
+        StockCraft.ui.showToast('Deposit Failed', res ? res.message : 'Deposit failed', 'error');
     }
 }

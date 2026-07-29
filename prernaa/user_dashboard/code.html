@@ -45,6 +45,24 @@
 
     <main class="pt-20 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
 
+        <!-- Auth Banner if not logged in -->
+        <div id="auth-banner" class="hidden glass-panel p-6 rounded-3xl border-emerald-500/40 bg-gradient-to-r from-emerald-950/40 to-slate-900 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+                    <span class="material-symbols-outlined text-2xl">lock</span>
+                </div>
+                <div>
+                    <h3 class="font-headline font-bold text-white text-base">Sign In to Save Your Trading Wallet & Portfolio</h3>
+                    <p class="text-xs text-slate-300">Logged in users get permanent $25,000 cash saving, custom AI advice, and instant trade execution!</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="/prernaa/authentication/code.html" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-headline font-black text-xs rounded-xl shadow-lg transition-all">
+                    Sign In / Register Now
+                </a>
+            </div>
+        </div>
+
         <!-- Header Summary Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             <!-- Total Portfolio Value -->
@@ -66,7 +84,10 @@
                     <span class="material-symbols-outlined text-cyan-400">payments</span>
                 </div>
                 <div class="text-3xl font-black font-headline text-cyan-400" id="stat-cash">$0.00</div>
-                <div class="text-xs text-slate-400 mt-2">Ready for Stock Purchases</div>
+                <button onclick="StockCraft.ui.openAddMoneyModal()" class="text-xs text-emerald-400 hover:underline mt-2 inline-flex items-center gap-1 font-semibold">
+                    <span class="material-symbols-outlined text-xs">add_circle</span>
+                    <span>Deposit / Add Funds →</span>
+                </button>
             </div>
 
             <!-- Total Invested -->
@@ -76,7 +97,7 @@
                     <span class="material-symbols-outlined text-indigo-400">monitoring</span>
                 </div>
                 <div class="text-3xl font-black font-headline text-white" id="stat-invested">$0.00</div>
-                <div class="text-xs text-slate-400 mt-2">Active Holdings Capital</div>
+                <div class="text-xs text-slate-400 mt-2">Active Stock Holdings</div>
             </div>
 
             <!-- Active User Tier -->
@@ -87,7 +108,7 @@
                 </div>
                 <div class="text-2xl font-black font-headline text-amber-400" id="stat-plan">Free Learner</div>
                 <a href="/prernaa/pricing_page/code.html" class="text-xs text-amber-300 hover:underline mt-2 inline-block font-semibold">
-                    Upgrade to Pro AI →
+                    Upgrade Plan →
                 </a>
             </div>
         </div>
@@ -298,6 +319,10 @@
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('navbar-mount').innerHTML = StockCraft.renderNavbar('dashboard');
             
+            if (!StockCraft.isLoggedIn()) {
+                document.getElementById('auth-banner').classList.remove('hidden');
+            }
+
             // Populate stock dropdown
             const stocks = StockCraft.getStocks();
             const select = document.getElementById('stock-selector');
@@ -362,7 +387,7 @@
             txnBody.innerHTML = txns.map(t => `
                 <tr class="hover:bg-slate-900/50">
                     <td class="p-3 font-mono text-emerald-400 font-bold">${t.id}</td>
-                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${t.type === 'BUY' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'}">${t.type}</span></td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${t.type === 'BUY' ? 'bg-emerald-500/20 text-emerald-300' : t.type === 'DEPOSIT' ? 'bg-cyan-500/20 text-cyan-300' : 'bg-rose-500/20 text-rose-300'}">${t.type}</span></td>
                     <td class="p-3 font-bold text-white">${t.symbol}</td>
                     <td class="p-3">${t.shares}</td>
                     <td class="p-3">${summary.currency}${t.price.toFixed(2)}</td>
@@ -427,24 +452,26 @@
             document.getElementById('order-total-price').innerText = `${state.currency}${total.toFixed(2)}`;
         }
 
-        function submitTradeOrder() {
+        // FIXED ASYNC/AWAIT SUBMIT ORDER HANDLER
+        async function submitTradeOrder() {
             const shares = parseInt(document.getElementById('order-shares').value) || 0;
             let result;
+
             if (currentOrderType === 'BUY') {
-                result = StockCraft.buyStock(currentSymbol, shares);
+                result = await StockCraft.buyStock(currentSymbol, shares);
             } else {
-                result = StockCraft.sellStock(currentSymbol, shares);
+                result = await StockCraft.sellStock(currentSymbol, shares);
             }
 
-            if (result.success) {
+            if (result && result.success) {
                 StockCraft.ui.showToast('Order Executed!', result.message, 'success');
                 refreshDashboard();
             } else {
-                StockCraft.ui.showToast('Trade Error', result.message, 'error');
+                StockCraft.ui.showToast('Trade Failed', result ? result.message : 'Execution error', 'error');
             }
         }
 
-        function quickSell(symbol, maxShares) {
+        async function quickSell(symbol, maxShares) {
             switchStock(symbol);
             setOrderType('SELL');
             document.getElementById('order-shares').value = maxShares;

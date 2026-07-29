@@ -1,0 +1,103 @@
+{
+  "users": [
+    {
+      "id": "usr_demo",
+      "name": "Alex Smith (Demo Trader)",
+      "email": "trader@stockcraft.ai",
+      "passwordHash": "$2b$08$7xmmu7BxakwzryF2r7Dvpuei.8nA0xi6itv.FRyn8qNDtWrBy/Gui",
+      "currency": "$",
+      "cash": 5440,
+      "plan": "Free Learner",
+      "portfolio": [
+        {
+          "symbol": "SPY",
+          "shares": 10,
+          "avgPrice": 535
+        },
+        {
+          "symbol": "AAPL",
+          "shares": 15,
+          "avgPrice": 215
+        },
+        {
+          "symbol": "NVDA",
+          "shares": 200,
+          "avgPrice": 122.8
+        }
+      ],
+      "transactions": [
+        {
+          "id": "TXN-637772",
+          "symbol": "NVDA",
+          "type": "BUY",
+          "shares": 50,
+          "price": 122.8,
+          "total": 6140,
+          "timestamp": "2026-07-29T18:23:10.770Z",
+          "status": "EXECUTED"
+        },
+        {
+          "id": "TXN-320992",
+          "symbol": "NVDA",
+          "type": "BUY",
+          "shares": 50,
+          "price": 122.8,
+          "total": 6140,
+          "timestamp": "2026-07-29T18:18:47.731Z",
+          "status": "EXECUTED"
+        },
+        {
+          "id": "TXN-856787",
+          "symbol": "NVDA",
+          "type": "BUY",
+          "shares": 50,
+          "price": 122.8,
+          "total": 6140,
+          "timestamp": "2026-07-29T18:18:37.344Z",
+          "status": "EXECUTED"
+        },
+        {
+          "id": "TXN-444128",
+          "symbol": "NVDA",
+          "type": "BUY",
+          "shares": 50,
+          "price": 122.8,
+          "total": 6140,
+          "timestamp": "2026-07-29T18:18:35.829Z",
+          "status": "EXECUTED"
+        },
+        {
+          "id": "DEP-380632",
+          "symbol": "WALLET_DEPOSIT",
+          "type": "DEPOSIT",
+          "shares": 1,
+          "price": 5000,
+          "total": 5000,
+          "method": "UPI",
+          "timestamp": "2026-07-29T18:16:57.911Z",
+          "status": "COMPLETED"
+        },
+        {
+          "id": "TXN-INIT-1",
+          "symbol": "SPY",
+          "type": "BUY",
+          "shares": 10,
+          "price": 535,
+          "total": 5350,
+          "timestamp": "2026-07-24T18:16:31.959Z",
+          "status": "EXECUTED"
+        },
+        {
+          "id": "TXN-INIT-2",
+          "symbol": "DEPOSIT",
+          "type": "DEPOSIT",
+          "shares": 1,
+          "price": 25000,
+          "total": 25000,
+          "timestamp": "2026-07-23T18:16:31.959Z",
+          "status": "COMPLETED"
+        }
+      ]
+    }
+  ]
+}
