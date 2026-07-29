@@ -1,36 +1,16 @@
 /**
  * StockCraft AI Engine - Core Client & Backend API Integration Layer
  * Handles Backend Authentication, Wallet Deposits, Paper Trading Orders,
- * Live Market Ticks, AI Response Engine, and Persistent Sessions.
+ * Hourly Market Ticks, AI Response Engine, and Persistent Sessions.
  */
 
 window.StockCraft = (function () {
-    const API_BASE = ''; // Relative path to Express server
+    const API_BASE = ''; 
     const TOKEN_KEY = 'stockcraft_token_v1';
     const LOCAL_STATE_KEY = 'stockcraft_state_v1';
 
-    // Default Stocks Data Fallback
+    // Stock Market Database with Hourly Chart Data & Trend Predictions
     const INITIAL_STOCKS = [
-        {
-            symbol: 'AAPL',
-            name: 'Apple Inc.',
-            sector: 'Technology',
-            price: 224.50,
-            change: +1.85,
-            changePercent: '+0.83%',
-            high: 226.10,
-            low: 222.40,
-            pe: 33.4,
-            marketCap: '$3.42T',
-            riskLevel: 'Low (Beginner Safe)',
-            riskScore: 2,
-            dividend: '0.5%',
-            aiSignal: 'STRONG BUY',
-            aiScore: 94,
-            aiSummary: 'Top choice for long-term growth and stable dividend returns. Dominates consumer ecosystem with strong AI hardware expansion.',
-            beginnerTip: 'Great first stock for beginners! Apple is a blue-chip company known for steady growth and low risk.',
-            chartData: [210, 212, 209, 215, 218, 220, 219, 222, 221, 224.50]
-        },
         {
             symbol: 'NVDA',
             name: 'NVIDIA Corporation',
@@ -42,114 +22,63 @@ window.StockCraft = (function () {
             low: 118.90,
             pe: 68.2,
             marketCap: '$3.02T',
+            trendType: 'INCREASING',
+            predictedGain: '+18.4% (AI Forecast)',
             riskLevel: 'Moderate (High Growth)',
             riskScore: 6,
             dividend: '0.04%',
-            aiSignal: 'BUY',
-            aiScore: 91,
-            aiSummary: 'Leading the global AI infrastructure boom. High price volatility makes it exciting but requires risk awareness for newcomers.',
-            beginnerTip: 'High growth potential! Consider buying small amounts over time (Dollar Cost Averaging) to manage volatility.',
-            chartData: [95, 102, 98, 105, 112, 110, 115, 119, 117, 122.80]
+            aiSignal: 'STRONG BUY (TOP GAINER)',
+            aiScore: 96,
+            aiSummary: '🔥 PREDICTED TO INCREASE: Surging demand for Blackwell AI chips. Hourly momentum is strongly bullish.',
+            beginnerTip: 'Great growth choice! High hourly volatility, ideal for dollar-cost averaging.',
+            hourlyLabels: ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM (Close)'],
+            chartData: [118.50, 119.20, 120.10, 121.00, 120.80, 121.90, 122.30, 122.80]
+        },
+        {
+            symbol: 'AAPL',
+            name: 'Apple Inc.',
+            sector: 'Technology',
+            price: 224.50,
+            change: +1.85,
+            changePercent: '+0.83%',
+            high: 226.10,
+            low: 222.40,
+            pe: 33.4,
+            marketCap: '$3.42T',
+            trendType: 'INCREASING',
+            predictedGain: '+12.0% (AI Forecast)',
+            riskLevel: 'Low (Beginner Safe)',
+            riskScore: 2,
+            dividend: '0.5%',
+            aiSignal: 'BUY (STEADY GROWTH)',
+            aiScore: 94,
+            aiSummary: '📈 PREDICTED TO INCREASE: Apple Intelligence ecosystem rollout driving steady hourly price expansion.',
+            beginnerTip: 'Safe anchor stock! Ideal for your first practice trade.',
+            hourlyLabels: ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM (Close)'],
+            chartData: [222.10, 222.80, 223.00, 223.50, 223.90, 224.10, 224.30, 224.50]
         },
         {
             symbol: 'MSFT',
             name: 'Microsoft Corp',
             sector: 'Software & Cloud',
             price: 448.20,
-            change: -0.65,
-            changePercent: '-0.14%',
+            change: +3.10,
+            changePercent: '+0.70%',
             high: 451.00,
             low: 446.10,
             pe: 35.8,
             marketCap: '$3.33T',
+            trendType: 'INCREASING',
+            predictedGain: '+15.2% (AI Forecast)',
             riskLevel: 'Low (Beginner Safe)',
             riskScore: 2,
             dividend: '0.7%',
             aiSignal: 'STRONG BUY',
-            aiScore: 96,
-            aiSummary: 'Azure cloud growth combined with OpenAI integration makes Microsoft a premier foundation stock for any portfolio.',
-            beginnerTip: 'Very safe anchor stock. Microsoft generates steady profits year after year.',
-            chartData: [420, 425, 430, 428, 435, 440, 442, 445, 447, 448.20]
-        },
-        {
-            symbol: 'TSLA',
-            name: 'Tesla, Inc.',
-            sector: 'Automotive & Clean Energy',
-            price: 246.30,
-            change: -5.10,
-            changePercent: '-2.03%',
-            high: 254.00,
-            low: 243.50,
-            pe: 62.1,
-            marketCap: '$785B',
-            riskLevel: 'High (Speculative)',
-            riskScore: 8,
-            dividend: '0.0%',
-            aiSignal: 'NEUTRAL / HOLD',
-            aiScore: 68,
-            aiSummary: 'EV margin pressures balanced by Full Self-Driving & Optimus Robot long-term optionality.',
-            beginnerTip: 'Warning for beginners: Tesla experiences large price swings. Only allocate a small percentage of your cash here.',
-            chartData: [210, 225, 195, 230, 215, 240, 260, 252, 255, 246.30]
-        },
-        {
-            symbol: 'AMZN',
-            name: 'Amazon.com Inc.',
-            sector: 'E-Commerce & Cloud',
-            price: 186.40,
-            change: +2.15,
-            changePercent: '+1.17%',
-            high: 188.00,
-            low: 184.20,
-            pe: 42.5,
-            marketCap: '$1.94T',
-            riskLevel: 'Low-Moderate',
-            riskScore: 3,
-            dividend: '0.0%',
-            aiSignal: 'BUY',
-            aiScore: 89,
-            aiSummary: 'AWS cloud re-acceleration paired with AI logistics efficiency yields expanding profit margins.',
-            beginnerTip: 'Great combination of e-commerce stability and high-tech cloud expansion.',
-            chartData: [170, 173, 175, 172, 178, 181, 180, 183, 185, 186.40]
-        },
-        {
-            symbol: 'RELIANCE',
-            name: 'Reliance Industries Ltd',
-            sector: 'Conglomerate & Energy',
-            price: 2980.00,
-            change: +18.50,
-            changePercent: '+0.62%',
-            high: 3010.00,
-            low: 2965.00,
-            pe: 28.5,
-            marketCap: '₹20.15 Lakh Cr',
-            riskLevel: 'Low (Beginner Safe)',
-            riskScore: 2,
-            dividend: '0.4%',
-            aiSignal: 'STRONG BUY',
-            aiScore: 93,
-            aiSummary: 'India\'s largest market cap company with booming Telecom (Jio) and Retail sectors.',
-            beginnerTip: 'Ideal starting stock for Indian market investors looking for blue-chip security.',
-            chartData: [2800, 2820, 2850, 2890, 2910, 2940, 2930, 2960, 2975, 2980.00]
-        },
-        {
-            symbol: 'TATAMOTORS',
-            name: 'Tata Motors Ltd',
-            sector: 'Automotive (EV Leader)',
-            price: 1012.00,
-            change: +14.20,
-            changePercent: '+1.42%',
-            high: 1025.00,
-            low: 998.00,
-            pe: 18.2,
-            marketCap: '₹3.72 Lakh Cr',
-            riskLevel: 'Moderate',
-            riskScore: 4,
-            dividend: '0.6%',
-            aiSignal: 'BUY',
-            aiScore: 88,
-            aiSummary: 'Leading electric vehicle revolution in India alongside Jaguar Land Rover (JLR) luxury turnaround.',
-            beginnerTip: 'Great growth pick for EV adoption trends in emerging markets.',
-            chartData: [880, 910, 930, 920, 950, 975, 990, 985, 1000, 1012.00]
+            aiScore: 95,
+            aiSummary: '📈 PREDICTED TO INCREASE: Cloud AI adoption accelerating across enterprise clients hourly.',
+            beginnerTip: 'Very low risk. Microsoft is a rock-solid cornerstone stock.',
+            hourlyLabels: ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM (Close)'],
+            chartData: [445.00, 445.80, 446.20, 447.00, 447.50, 447.80, 448.00, 448.20]
         },
         {
             symbol: 'SPY',
@@ -162,14 +91,109 @@ window.StockCraft = (function () {
             low: 549.80,
             pe: 26.1,
             marketCap: '$560B',
+            trendType: 'STABLE / INCREASING',
+            predictedGain: '+10.5% (Historical Avg)',
             riskLevel: 'Ultra Low (Safest for Beginners)',
             riskScore: 1,
             dividend: '1.2%',
-            aiSignal: 'STRONG BUY (RECOMMENDED)',
+            aiSignal: 'STRONG BUY (SAFEST PICK)',
             aiScore: 98,
-            aiSummary: 'Holds the top 500 largest US companies in one single fund. Historically averages ~10% annual return.',
-            beginnerTip: '🌟 THE #1 RECOMMENDED FIRST PURCHASE FOR ALL BEGINNERS! When in doubt, start with an S&P 500 ETF.',
-            chartData: [520, 525, 528, 532, 538, 542, 545, 548, 550, 552.10]
+            aiSummary: '🌟 PREDICTED TO INCREASE: Holds 500 top companies. Hourly index steady upward movement.',
+            beginnerTip: 'The #1 recommended first stock purchase for all beginners!',
+            hourlyLabels: ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM (Close)'],
+            chartData: [549.80, 550.20, 550.80, 551.20, 551.50, 551.80, 552.00, 552.10]
+        },
+        {
+            symbol: 'TSLA',
+            name: 'Tesla, Inc.',
+            sector: 'Automotive & Clean Energy',
+            price: 246.30,
+            change: -5.10,
+            changePercent: '-2.03%',
+            high: 254.00,
+            low: 243.50,
+            pe: 62.1,
+            marketCap: '$785B',
+            trendType: 'DECREASING',
+            predictedGain: '-4.2% Short-Term Correction',
+            riskLevel: 'High (Speculative)',
+            riskScore: 8,
+            dividend: '0.0%',
+            aiSignal: 'NEUTRAL / DECREASING WARNING',
+            aiScore: 64,
+            aiSummary: '📉 CURRENTLY DECREASING: Hourly selling pressure due to short-term margin compression. Wait for support before buying.',
+            beginnerTip: 'Caution: Currently in an hourly downward trend. Avoid putting large funds here until price stabilizes.',
+            hourlyLabels: ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM (Close)'],
+            chartData: [253.50, 251.20, 249.80, 248.50, 247.90, 247.10, 246.80, 246.30]
+        },
+        {
+            symbol: 'AMZN',
+            name: 'Amazon.com Inc.',
+            sector: 'E-Commerce & Cloud',
+            price: 186.40,
+            change: +2.15,
+            changePercent: '+1.17%',
+            high: 188.00,
+            low: 184.20,
+            pe: 42.5,
+            marketCap: '$1.94T',
+            trendType: 'INCREASING',
+            predictedGain: '+13.8% (AI Forecast)',
+            riskLevel: 'Low-Moderate',
+            riskScore: 3,
+            dividend: '0.0%',
+            aiSignal: 'BUY',
+            aiScore: 89,
+            aiSummary: '📈 PREDICTED TO INCREASE: AWS growth and logistics automation driving positive hourly price candles.',
+            beginnerTip: 'Great combination of retail dominance and cloud tech growth.',
+            hourlyLabels: ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM (Close)'],
+            chartData: [184.20, 184.80, 185.10, 185.50, 185.80, 186.10, 186.20, 186.40]
+        },
+        {
+            symbol: 'RELIANCE',
+            name: 'Reliance Industries Ltd',
+            sector: 'Conglomerate & Energy',
+            price: 2980.00,
+            change: +18.50,
+            changePercent: '+0.62%',
+            high: 3010.00,
+            low: 2965.00,
+            pe: 28.5,
+            marketCap: '₹20.15 Lakh Cr',
+            trendType: 'INCREASING',
+            predictedGain: '+11.2% (AI Forecast)',
+            riskLevel: 'Low (Beginner Safe)',
+            riskScore: 2,
+            dividend: '0.4%',
+            aiSignal: 'STRONG BUY',
+            aiScore: 93,
+            aiSummary: '📈 PREDICTED TO INCREASE: Booming Telecom (Jio) and Retail sectors pushing hourly prices up.',
+            beginnerTip: 'Ideal starting stock for Indian market investors.',
+            hourlyLabels: ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM (Close)'],
+            chartData: [2965.00, 2968.00, 2972.00, 2975.00, 2978.00, 2979.00, 2980.00, 2980.00]
+        },
+        {
+            symbol: 'TATAMOTORS',
+            name: 'Tata Motors Ltd',
+            sector: 'Automotive (EV Leader)',
+            price: 1012.00,
+            change: -8.50,
+            changePercent: '-0.83%',
+            high: 1025.00,
+            low: 998.00,
+            pe: 18.2,
+            marketCap: '₹3.72 Lakh Cr',
+            trendType: 'DECREASING',
+            predictedGain: '-2.1% Short-Term Dip',
+            riskLevel: 'Moderate',
+            riskScore: 4,
+            dividend: '0.6%',
+            aiSignal: 'HOLD / DIP BUY OPPORTUNITY',
+            aiScore: 82,
+            aiSummary: '📉 CURRENTLY DECREASING: Minor hourly pullback. Good potential dip-buying opportunity for long-term investors.',
+            beginnerTip: 'Short-term hourly dip. Watch for price reversal before placing order.',
+            hourlyLabels: ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM (Close)'],
+            chartData: [1022.00, 1020.00, 1018.00, 1016.00, 1015.00, 1014.00, 1013.00, 1012.00]
         }
     ];
 
@@ -201,7 +225,7 @@ window.StockCraft = (function () {
                 }
             ],
             aiHistory: [
-                { sender: 'ai', text: '👋 Hello! I am **StockBuddy AI**, your stock market mentor. Ask me anything!' }
+                { sender: 'ai', text: '👋 Hello! I am **StockBuddy AI**. Ask me which stocks are **increasing** or **decreasing**!' }
             ]
         };
         localStorage.setItem(LOCAL_STATE_KEY, JSON.stringify(def));
@@ -222,8 +246,7 @@ window.StockCraft = (function () {
             const opts = { method, headers };
             if (data) opts.body = JSON.stringify(data);
             const res = await fetch(API_BASE + endpoint, opts);
-            const json = await res.json();
-            return json;
+            return await res.json();
         } catch (e) {
             console.warn('Backend API connection offline, using client fallback', e);
             return null;
@@ -267,7 +290,7 @@ window.StockCraft = (function () {
             } else if (res && res.error) {
                 return { success: false, message: res.error };
             }
-            // Fallback: auto login demo
+            // Fallback
             const st = getLocalState();
             st.name = name;
             st.currency = currency || '$';
@@ -292,7 +315,6 @@ window.StockCraft = (function () {
                 return { success: false, message: res.error };
             }
 
-            // Fallback for demo credentials
             if (email === 'trader@stockcraft.ai' || email.includes('@')) {
                 localStorage.setItem(TOKEN_KEY, 'demo_token_' + Date.now());
                 const st = getLocalState();
@@ -306,12 +328,10 @@ window.StockCraft = (function () {
             window.location.href = '/index.html';
         },
 
-        // --- WALLET & ADD MONEY OPTION ---
+        // --- WALLET & ADD MONEY ---
         addMoney: async function (amount, paymentMethod = 'CREDIT_CARD') {
             amount = parseFloat(amount);
-            if (isNaN(amount) || amount <= 0) {
-                return { success: false, message: 'Please enter a valid amount.' };
-            }
+            if (isNaN(amount) || amount <= 0) return { success: false, message: 'Please enter a valid amount.' };
 
             const res = await apiCall('/api/wallet/deposit', 'POST', { amount, paymentMethod });
             if (res && res.success) {
@@ -322,7 +342,6 @@ window.StockCraft = (function () {
                 return { success: true, message: res.message, newCash: res.newCash, receipt: res.receipt };
             }
 
-            // Local Fallback
             const st = getLocalState();
             st.cash += amount;
             const txn = {
@@ -346,12 +365,10 @@ window.StockCraft = (function () {
             };
         },
 
-        // --- PURCHASE STOCK SIMULATOR ---
+        // --- PURCHASE STOCK ---
         buyStock: async function (symbol, shares) {
             shares = parseInt(shares);
-            if (isNaN(shares) || shares <= 0) {
-                return { success: false, message: 'Please enter a valid number of shares.' };
-            }
+            if (isNaN(shares) || shares <= 0) return { success: false, message: 'Please enter a valid number of shares.' };
 
             if (!this.isLoggedIn()) {
                 return {
@@ -372,7 +389,6 @@ window.StockCraft = (function () {
                 return { success: false, message: res.error };
             }
 
-            // Local Engine Fallback
             const stock = this.getStock(symbol);
             const total = stock.price * shares;
             const st = getLocalState();
@@ -412,9 +428,7 @@ window.StockCraft = (function () {
 
         sellStock: async function (symbol, shares) {
             shares = parseInt(shares);
-            if (isNaN(shares) || shares <= 0) {
-                return { success: false, message: 'Please enter a valid number of shares.' };
-            }
+            if (isNaN(shares) || shares <= 0) return { success: false, message: 'Please enter a valid number of shares.' };
 
             if (!this.isLoggedIn()) {
                 return {
@@ -435,7 +449,6 @@ window.StockCraft = (function () {
                 return { success: false, message: res.error };
             }
 
-            // Fallback
             const stock = this.getStock(symbol);
             const st = getLocalState();
             const idx = st.portfolio.findIndex(p => p.symbol === stock.symbol);
@@ -532,16 +545,16 @@ window.StockCraft = (function () {
 
             if (targetSymbol) {
                 const stock = this.getStock(targetSymbol);
-                responseText = `### 🤖 StockBuddy AI Evaluation: **${stock.symbol} (${stock.name})**\n\n` +
+                responseText = `### 🤖 StockBuddy AI Analysis: **${stock.symbol} (${stock.name})**\n\n` +
                     `- **Current Price**: ${state.currency}${stock.price.toFixed(2)} (${stock.changePercent})\n` +
-                    `- **AI Recommendation**: <span class="text-emerald-400 font-bold">${stock.aiSignal}</span> (Score: ${stock.aiScore}/100)\n` +
-                    `- **Risk Level**: **${stock.riskLevel}**\n\n` +
-                    `**Why consider this stock?**\n${stock.aiSummary}\n\n` +
+                    `- **Trend**: <span class="${stock.trendType === 'INCREASING' ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}">${stock.trendType}</span> (${stock.predictedGain})\n` +
+                    `- **AI Recommendation**: **${stock.aiSignal}** (Score: ${stock.aiScore}/100)\n\n` +
+                    `**AI Summary**: ${stock.aiSummary}\n\n` +
                     `💡 **Beginner Tip**: ${stock.beginnerTip}`;
             } else {
-                responseText = `### 💡 AI Market Guidance for Beginners\n\n` +
+                responseText = `### 💡 StockBuddy AI Market Guidance\n\n` +
                     `Question: *"${userQuery}"*\n\n` +
-                    `Rule of Thumb: **Invest in what you know and understand.** Always maintain cash reserve! You currently have **${state.currency}${state.cash.toLocaleString(undefined, {minimumFractionDigits:2})}** available in your wallet.`;
+                    `Top Recommendation: Look at stocks marked **"PREDICTED TO INCREASE"** (like **NVDA** or **AAPL**). Always maintain virtual cash reserves!`;
             }
 
             state.aiHistory.push({ sender: 'user', text: userQuery });
@@ -550,7 +563,7 @@ window.StockCraft = (function () {
             return responseText;
         },
 
-        // Clean Header Navigation with Top-Right Auth Gating & Add Money Launcher
+        // PROMINENT TOP-RIGHT AUTHENTICATION CONTROLS
         renderNavbar: function (activePage = 'home') {
             const state = getLocalState();
             const loggedIn = this.isLoggedIn();
@@ -575,22 +588,22 @@ window.StockCraft = (function () {
                 </a>`;
             }).join('');
 
-            // TOP-RIGHT CORNER AUTHENTICATION CONTROL
+            // TOP-RIGHT CORNER PROMINENT AUTH BUTTONS
             let topRightControls = '';
             if (loggedIn) {
                 topRightControls = `
-                <div class="flex items-center gap-2.5">
-                    <button onclick="StockCraft.ui.openAddMoneyModal()" class="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold rounded-xl flex items-center gap-1 transition-all active:scale-95">
+                <div class="flex items-center gap-3">
+                    <button onclick="StockCraft.ui.openAddMoneyModal()" class="px-3.5 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-headline font-bold rounded-xl flex items-center gap-1.5 transition-all active:scale-95">
                         <span class="material-symbols-outlined text-base">add_circle</span>
                         <span>Add Money</span>
                     </button>
 
-                    <a href="/prernaa/user_dashboard/code.html" class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 rounded-xl font-headline font-bold text-xs shadow-lg shadow-emerald-500/20 active:scale-95 transition-all">
+                    <a href="/prernaa/user_dashboard/code.html" class="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 rounded-xl font-headline font-extrabold text-xs shadow-lg shadow-emerald-500/20 active:scale-95 transition-all">
                         <span class="material-symbols-outlined text-base">account_balance_wallet</span>
                         <span>${state.currency}${state.cash.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>
                     </a>
 
-                    <button onclick="StockCraft.logout()" class="px-3 py-1.5 bg-slate-800 hover:bg-rose-500/20 text-rose-300 text-xs font-bold rounded-xl border border-slate-700 transition-all flex items-center gap-1">
+                    <button onclick="StockCraft.logout()" class="px-3.5 py-2 bg-slate-800 hover:bg-rose-500/20 text-rose-300 text-xs font-bold rounded-xl border border-slate-700 transition-all flex items-center gap-1">
                         <span class="material-symbols-outlined text-sm">logout</span>
                         <span>Logout</span>
                     </button>
@@ -598,13 +611,13 @@ window.StockCraft = (function () {
                 `;
             } else {
                 topRightControls = `
-                <div class="flex items-center gap-2">
-                    <a href="/prernaa/authentication/code.html" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700/80 text-xs font-headline font-bold rounded-xl transition-all flex items-center gap-1">
-                        <span class="material-symbols-outlined text-sm">login</span>
+                <div class="flex items-center gap-3">
+                    <a href="/prernaa/authentication/code.html" class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-100 border border-slate-700/90 text-xs font-headline font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-base text-slate-400">login</span>
                         <span>Sign In</span>
                     </a>
-                    <a href="/prernaa/authentication/code.html?mode=register" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-headline font-extrabold text-xs rounded-xl shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-1">
-                        <span class="material-symbols-outlined text-sm">person_add</span>
+                    <a href="/prernaa/authentication/code.html?mode=register" class="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-headline font-black text-xs rounded-xl shadow-xl shadow-emerald-500/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-base">person_add</span>
                         <span>Sign Up</span>
                     </a>
                 </div>
@@ -612,7 +625,7 @@ window.StockCraft = (function () {
             }
 
             return `
-            <nav class="fixed top-0 left-0 w-full z-50 bg-slate-950/90 backdrop-blur-xl border-b border-slate-800 shadow-2xl">
+            <nav class="fixed top-0 left-0 w-full z-50 bg-slate-950/95 backdrop-blur-xl border-b border-slate-800/80 shadow-2xl">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                     <a href="/index.html" class="flex items-center gap-2 text-xl font-extrabold tracking-tight text-white group">
                         <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-cyan-500 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">

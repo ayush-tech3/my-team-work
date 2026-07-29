@@ -50,9 +50,9 @@
             <div>
                 <h1 class="text-3xl sm:text-4xl font-black font-headline text-white tracking-tight flex items-center gap-3">
                     <span class="material-symbols-outlined text-emerald-400 text-3xl">show_chart</span>
-                    <span>Interactive Market Chart Studio</span>
+                    <span>Hourly Market Chart Studio</span>
                 </h1>
-                <p class="text-slate-400 text-xs mt-1">Visualize price trends, indicators, and AI forecasts for any stock asset.</p>
+                <p class="text-slate-400 text-xs mt-1">Visualize hourly price ticks, moving averages, and AI trend forecasts for any stock asset.</p>
             </div>
 
             <!-- Asset Selector & Control Buttons -->
@@ -73,22 +73,21 @@
             <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
                 <!-- Timeframes -->
                 <div class="flex gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs font-bold text-slate-400">
-                    <button class="px-3 py-1.5 rounded-lg bg-emerald-500 text-slate-950 font-extrabold">1D</button>
-                    <button class="px-3 py-1.5 rounded-lg hover:text-white">1W</button>
-                    <button class="px-3 py-1.5 rounded-lg hover:text-white">1M</button>
-                    <button class="px-3 py-1.5 rounded-lg hover:text-white">1Y</button>
-                    <button class="px-3 py-1.5 rounded-lg hover:text-white">ALL</button>
+                    <button class="px-3 py-1.5 rounded-lg bg-emerald-500 text-slate-950 font-extrabold">1 Hour Ticks</button>
+                    <button class="px-3 py-1.5 rounded-lg hover:text-white">4 Hours</button>
+                    <button class="px-3 py-1.5 rounded-lg hover:text-white">Daily</button>
+                    <button class="px-3 py-1.5 rounded-lg hover:text-white">Weekly</button>
                 </div>
 
                 <!-- Indicator Toggles -->
                 <div class="flex items-center gap-3 text-xs font-bold">
                     <label class="flex items-center gap-2 text-slate-300 cursor-pointer">
                         <input type="checkbox" id="toggle-sma" checked onchange="toggleIndicator('sma')" class="rounded border-slate-700 text-emerald-500 focus:ring-0"/>
-                        <span>SMA-20 Indicator</span>
+                        <span>SMA Moving Avg</span>
                     </label>
                     <label class="flex items-center gap-2 text-slate-300 cursor-pointer">
                         <input type="checkbox" id="toggle-ai" checked onchange="toggleIndicator('ai')" class="rounded border-slate-700 text-cyan-500 focus:ring-0"/>
-                        <span>AI Projection Line</span>
+                        <span>AI Hourly Forecast</span>
                     </label>
                 </div>
             </div>
@@ -112,7 +111,7 @@
             
             const stocks = StockCraft.getStocks();
             const select = document.getElementById('chart-asset-select');
-            select.innerHTML = stocks.map(s => `<option value="${s.symbol}">${s.symbol} — ${s.name}</option>`).join('');
+            select.innerHTML = stocks.map(s => `<option value="${s.symbol}">${s.symbol} — ${s.name} (${s.trendType})</option>`).join('');
             select.value = activeSymbol;
 
             renderStudioChart(activeSymbol);
@@ -125,26 +124,25 @@
 
             if (studioChart) studioChart.destroy();
 
-            // Calculate SMA-20 mock line
-            const smaData = stock.chartData.map((v, i) => v * (1 - (0.02 * (i % 3))));
-            const aiData = stock.chartData.map((v, i) => i > 5 ? v * 1.04 : null);
+            const smaData = stock.chartData.map((v, i) => v * (1 - (0.01 * (i % 3))));
+            const aiData = stock.chartData.map((v, i) => i > 4 ? (stock.trendType === 'INCREASING' ? v * 1.03 : v * 0.97) : null);
 
             studioChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['09:30', '10:30', '11:30', '12:30', '13:30', '14:30', '15:30', '16:00', 'After Hours', 'AI Forecast'],
+                    labels: stock.hourlyLabels,
                     datasets: [
                         {
-                            label: `${stock.symbol} Price`,
+                            label: `${stock.symbol} Hourly Price`,
                             data: stock.chartData,
-                            borderColor: '#10b981',
-                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderColor: stock.trendType === 'INCREASING' ? '#10b981' : '#f43f5e',
+                            backgroundColor: stock.trendType === 'INCREASING' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(244, 63, 94, 0.1)',
                             fill: true,
                             tension: 0.3,
                             borderWidth: 3
                         },
                         {
-                            label: 'SMA-20',
+                            label: 'SMA-20 Indicator',
                             data: smaData,
                             borderColor: '#eab308',
                             borderWidth: 2,
@@ -152,7 +150,7 @@
                             fill: false
                         },
                         {
-                            label: 'AI Trend Forecast',
+                            label: 'AI Hourly Forecast',
                             data: aiData,
                             borderColor: '#06b6d4',
                             borderDash: [6, 6],

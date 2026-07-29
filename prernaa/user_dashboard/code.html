@@ -126,15 +126,15 @@
                             <select id="stock-selector" onchange="switchStock(this.value)" class="bg-slate-900 border border-slate-700 text-white font-headline font-bold text-lg rounded-xl px-4 py-2 focus:border-emerald-400 focus:outline-none">
                                 <!-- Populated dynamically -->
                             </select>
-                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" id="active-risk-badge">
-                                Low Risk
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" id="active-trend-badge">
+                                INCREASING
                             </span>
                         </div>
 
                         <!-- Price Pill -->
                         <div class="text-right">
                             <div class="text-2xl sm:text-3xl font-black font-headline text-white" id="active-price">$0.00</div>
-                            <div class="text-xs font-bold text-emerald-400" id="active-change">+0.00%</div>
+                            <div class="text-xs font-bold text-emerald-400" id="active-change">+0.00% (Hourly)</div>
                         </div>
                     </div>
 
@@ -145,7 +145,7 @@
                         </div>
                         <div>
                             <div class="flex items-center gap-2">
-                                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">StockBuddy AI Evaluation:</span>
+                                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">StockBuddy AI Hourly Analysis:</span>
                                 <span class="text-xs font-extrabold text-emerald-400 uppercase" id="active-ai-signal">STRONG BUY</span>
                             </div>
                             <p class="text-xs text-slate-300 mt-1 leading-relaxed" id="active-ai-summary">
@@ -154,7 +154,19 @@
                         </div>
                     </div>
 
-                    <!-- Chart Canvas -->
+                    <!-- Chart Resolution Toolbar & Canvas -->
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-xs font-bold text-slate-400 uppercase flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">schedule</span>
+                            <span>Hourly Market Resolution (1H)</span>
+                        </span>
+                        <div class="flex gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-[11px] font-bold text-slate-400">
+                            <button class="px-2.5 py-1 rounded-lg bg-emerald-500 text-slate-950 font-extrabold">1H Ticks</button>
+                            <button class="px-2.5 py-1 rounded-lg hover:text-white">4H Ticks</button>
+                            <button class="px-2.5 py-1 rounded-lg hover:text-white">Daily</button>
+                        </div>
+                    </div>
+
                     <div class="relative w-full h-[320px]">
                         <canvas id="stockChart"></canvas>
                     </div>
@@ -162,11 +174,11 @@
                     <div class="flex justify-between items-center mt-4 text-xs text-slate-400">
                         <span class="flex items-center gap-1">
                             <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
-                            <span>Historical Price</span>
+                            <span>Hourly Stock Price</span>
                         </span>
                         <span class="flex items-center gap-1">
                             <span class="w-2 h-2 rounded-full bg-cyan-400 inline-block"></span>
-                            <span>AI Forecast Trend Projection</span>
+                            <span>AI Forecast Trend</span>
                         </span>
                     </div>
                 </div>
@@ -213,7 +225,7 @@
                             <span class="material-symbols-outlined text-emerald-400">shopping_cart</span>
                             <span>Order Execution Terminal</span>
                         </h3>
-                        <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-semibold">SIMULATED CASH</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-semibold">HOURLY TRADING</span>
                     </div>
 
                     <!-- Buy / Sell Toggle Tabs -->
@@ -229,7 +241,7 @@
                     <!-- Selected Symbol Indicator -->
                     <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
                         <span class="text-slate-400 font-bold uppercase">Selected Asset:</span>
-                        <span class="font-headline font-black text-white text-sm" id="order-asset-name">AAPL</span>
+                        <span class="font-headline font-black text-white text-sm" id="order-asset-name">NVDA</span>
                     </div>
 
                     <!-- Shares Quantity Input -->
@@ -268,7 +280,7 @@
                     </div>
 
                     <form onsubmit="handleSidebarAISubmit(event)" class="flex gap-2">
-                        <input id="sidebar-ai-input" type="text" placeholder="Ask AI about this stock..." class="flex-1 bg-slate-900 border border-slate-700 focus:border-emerald-400 text-xs text-white rounded-xl px-3 py-2 focus:outline-none"/>
+                        <input id="sidebar-ai-input" type="text" placeholder="Which stock is increasing?" class="flex-1 bg-slate-900 border border-slate-700 focus:border-emerald-400 text-xs text-white rounded-xl px-3 py-2 focus:outline-none"/>
                         <button type="submit" class="px-3 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 rounded-xl font-bold">
                             <span class="material-symbols-outlined text-base">send</span>
                         </button>
@@ -312,7 +324,7 @@
     <!-- Script Injection -->
     <script src="../stock_engine.js"></script>
     <script>
-        let currentSymbol = 'AAPL';
+        let currentSymbol = 'NVDA';
         let currentOrderType = 'BUY';
         let chartInstance = null;
 
@@ -326,7 +338,7 @@
             // Populate stock dropdown
             const stocks = StockCraft.getStocks();
             const select = document.getElementById('stock-selector');
-            select.innerHTML = stocks.map(s => `<option value="${s.symbol}">${s.symbol} — ${s.name}</option>`).join('');
+            select.innerHTML = stocks.map(s => `<option value="${s.symbol}">${s.symbol} — ${s.name} (${s.trendType})</option>`).join('');
 
             refreshDashboard();
             initChart();
@@ -409,9 +421,12 @@
             const state = StockCraft.getState();
 
             document.getElementById('stock-selector').value = symbol;
-            document.getElementById('active-risk-badge').innerText = stock.riskLevel;
+            const badge = document.getElementById('active-trend-badge');
+            badge.innerText = stock.trendType;
+            badge.className = `px-3 py-1 rounded-full text-xs font-bold border ${stock.trendType === 'INCREASING' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'}`;
+
             document.getElementById('active-price').innerText = `${state.currency}${stock.price.toFixed(2)}`;
-            document.getElementById('active-change').innerText = `${stock.changePercent} (Today)`;
+            document.getElementById('active-change').innerText = `${stock.changePercent} (Hourly)`;
             document.getElementById('active-ai-signal').innerText = stock.aiSignal;
             document.getElementById('active-ai-summary').innerText = stock.aiSummary;
 
@@ -452,7 +467,6 @@
             document.getElementById('order-total-price').innerText = `${state.currency}${total.toFixed(2)}`;
         }
 
-        // FIXED ASYNC/AWAIT SUBMIT ORDER HANDLER
         async function submitTradeOrder() {
             const shares = parseInt(document.getElementById('order-shares').value) || 0;
             let result;
@@ -486,7 +500,7 @@
             alert(`📄 OFFICIAL DIGITAL TRANSACTION RECEIPT\n-----------------------------------\nTransaction ID: ${txn.id}\nType: ${txn.type}\nAsset: ${txn.symbol}\nShares: ${txn.shares}\nExecution Price: ${state.currency}${txn.price.toFixed(2)}\nTotal Amount: ${state.currency}${txn.total.toFixed(2)}\nDate: ${new Date(txn.timestamp).toLocaleString()}\nStatus: ${txn.status}\n-----------------------------------\nVerified by StockCraft AI Trading Engine.`);
         }
 
-        // Chart Initialization
+        // Hourly Chart Initialization
         function initChart() {
             const ctx = document.getElementById('stockChart').getContext('2d');
             const stock = StockCraft.getStock(currentSymbol);
@@ -494,20 +508,20 @@
             chartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['10d ago', '9d ago', '8d ago', '7d ago', '6d ago', '5d ago', '4d ago', '3d ago', 'Yesterday', 'Today'],
+                    labels: stock.hourlyLabels,
                     datasets: [
                         {
-                            label: 'Historical Price',
+                            label: `${stock.symbol} Hourly Price`,
                             data: stock.chartData,
-                            borderColor: '#10b981',
-                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderColor: stock.trendType === 'INCREASING' ? '#10b981' : '#f43f5e',
+                            backgroundColor: stock.trendType === 'INCREASING' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(244, 63, 94, 0.1)',
                             fill: true,
                             tension: 0.3,
                             borderWidth: 3
                         },
                         {
-                            label: 'AI Forecast Trend',
-                            data: [...stock.chartData.slice(0, 7), ...stock.chartData.slice(7).map(v => v * 1.03)],
+                            label: 'AI Hourly Forecast',
+                            data: [...stock.chartData.slice(0, 5), ...stock.chartData.slice(5).map(v => stock.trendType === 'INCREASING' ? v * 1.03 : v * 0.97)],
                             borderColor: '#06b6d4',
                             borderDash: [5, 5],
                             borderWidth: 2,
@@ -530,12 +544,14 @@
         }
 
         function updateChartData(stock) {
+            chartInstance.data.labels = stock.hourlyLabels;
             chartInstance.data.datasets[0].data = stock.chartData;
-            chartInstance.data.datasets[1].data = [...stock.chartData.slice(0, 7), ...stock.chartData.slice(7).map(v => v * 1.03)];
+            chartInstance.data.datasets[0].borderColor = stock.trendType === 'INCREASING' ? '#10b981' : '#f43f5e';
+            chartInstance.data.datasets[0].backgroundColor = stock.trendType === 'INCREASING' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(244, 63, 94, 0.1)';
+            chartInstance.data.datasets[1].data = [...stock.chartData.slice(0, 5), ...stock.chartData.slice(5).map(v => stock.trendType === 'INCREASING' ? v * 1.03 : v * 0.97)];
             chartInstance.update();
         }
 
-        // AI Sidebar Chat
         function renderAIChatHistory() {
             const state = StockCraft.getState();
             const container = document.getElementById('sidebar-ai-history');
