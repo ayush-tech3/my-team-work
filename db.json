@@ -22,6 +22,26 @@
       ],
       "transactions": [
         {
+          "id": "TXN-713417",
+          "symbol": "NVDA",
+          "type": "SELL",
+          "shares": 10,
+          "price": 122.8,
+          "total": 1228,
+          "timestamp": "2026-07-29T19:19:34.195Z",
+          "status": "EXECUTED"
+        },
+        {
+          "id": "TXN-531208",
+          "symbol": "NVDA",
+          "type": "BUY",
+          "shares": 10,
+          "price": 122.8,
+          "total": 1228,
+          "timestamp": "2026-07-29T19:19:27.019Z",
+          "status": "EXECUTED"
+        },
+        {
           "id": "TXN-495816",
           "symbol": "NVDA",
           "type": "SELL",
