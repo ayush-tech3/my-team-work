@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Login & Authentication — StockCraft AI</title>
+    <title>Account Login & Sign Up — StockCraft AI</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -35,36 +35,85 @@
         }
     </style>
 </head>
-<body class="bg-slate-950 font-body text-slate-100 min-h-screen flex flex-col justify-between">
+<body class="bg-slate-950 font-body text-slate-100 min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-slate-950">
 
     <!-- Global Navigation -->
     <div id="navbar-mount"></div>
 
     <main class="pt-24 pb-20 max-w-md mx-auto px-4 w-full">
         <div class="glass-panel p-8 rounded-3xl border-emerald-500/30 space-y-6 shadow-2xl">
-            <div class="text-center space-y-2">
-                <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold mx-auto">
-                    <span class="material-symbols-outlined text-2xl">lock</span>
-                </div>
-                <h1 class="text-3xl font-black font-headline text-white">Welcome Back</h1>
-                <p class="text-xs text-slate-400">Access your practice portfolio and StockBuddy AI insights.</p>
+            
+            <!-- Tab Header: Login vs Register -->
+            <div class="grid grid-cols-2 gap-2 p-1 bg-slate-900 rounded-2xl border border-slate-800">
+                <button id="tab-login" onclick="switchAuthTab('login')" class="py-2.5 font-headline font-bold text-xs rounded-xl bg-emerald-500 text-slate-950 shadow-md transition-all">
+                    Sign In
+                </button>
+                <button id="tab-register" onclick="switchAuthTab('register')" class="py-2.5 font-headline font-bold text-xs rounded-xl text-slate-400 hover:text-white transition-all">
+                    Create Account
+                </button>
             </div>
 
-            <form onsubmit="handleLogin(event)" class="space-y-4 text-xs">
+            <!-- Login Form -->
+            <form id="form-login" onsubmit="handleLoginSubmit(event)" class="space-y-4 text-xs">
+                <div class="text-center space-y-1">
+                    <h2 class="text-2xl font-black font-headline text-white">Welcome Back</h2>
+                    <p class="text-slate-400 text-xs">Sign in to access your portfolio & StockBuddy AI.</p>
+                </div>
+
                 <div>
                     <label class="block text-slate-300 font-bold mb-1">Email Address:</label>
-                    <input type="email" value="trader@stockcraft.ai" required class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-400 text-white rounded-xl px-4 py-3 focus:outline-none"/>
+                    <input id="login-email" type="email" value="trader@stockcraft.ai" required class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-400 text-white rounded-xl px-4 py-3 focus:outline-none"/>
                 </div>
 
                 <div>
                     <label class="block text-slate-300 font-bold mb-1">Password:</label>
-                    <input type="password" value="••••••••••••" required class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-400 text-white rounded-xl px-4 py-3 focus:outline-none"/>
+                    <input id="login-password" type="password" value="password123" required class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-400 text-white rounded-xl px-4 py-3 focus:outline-none"/>
                 </div>
 
-                <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 text-slate-950 font-headline font-black text-sm rounded-xl shadow-lg shadow-emerald-500/20 active:scale-95 transition-all">
-                    Sign In to Dashboard
+                <button type="submit" class="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 text-slate-950 font-headline font-black text-sm rounded-xl shadow-xl shadow-emerald-500/20 active:scale-95 transition-all">
+                    Sign In to Account
+                </button>
+
+                <p class="text-[10px] text-slate-400 text-center">
+                    Demo Account Pre-filled! Just click <strong>Sign In</strong>.
+                </p>
+            </form>
+
+            <!-- Register Form -->
+            <form id="form-register" onsubmit="handleRegisterSubmit(event)" class="hidden space-y-4 text-xs">
+                <div class="text-center space-y-1">
+                    <h2 class="text-2xl font-black font-headline text-white">Create Trader Account</h2>
+                    <p class="text-slate-400 text-xs">Get instant <strong>$25,000 Virtual Starting Cash</strong>.</p>
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 font-bold mb-1">Full Name:</label>
+                    <input id="reg-name" type="text" placeholder="John Doe" required class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-400 text-white rounded-xl px-4 py-3 focus:outline-none"/>
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 font-bold mb-1">Email Address:</label>
+                    <input id="reg-email" type="email" placeholder="john@example.com" required class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-400 text-white rounded-xl px-4 py-3 focus:outline-none"/>
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 font-bold mb-1">Password:</label>
+                    <input id="reg-password" type="password" placeholder="Create secure password" required class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-400 text-white rounded-xl px-4 py-3 focus:outline-none"/>
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 font-bold mb-1">Preferred Currency:</label>
+                    <select id="reg-currency" class="w-full bg-slate-900 border border-slate-700 focus:border-emerald-400 text-white rounded-xl px-4 py-2.5 focus:outline-none font-bold">
+                        <option value="$">US Dollar ($)</option>
+                        <option value="₹">Indian Rupee (₹)</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 text-slate-950 font-headline font-black text-sm rounded-xl shadow-xl shadow-emerald-500/20 active:scale-95 transition-all">
+                    Register & Claim $25K Cash
                 </button>
             </form>
+
         </div>
     </main>
 
@@ -75,10 +124,53 @@
             document.getElementById('navbar-mount').innerHTML = StockCraft.renderNavbar('login');
         });
 
-        function handleLogin(e) {
+        function switchAuthTab(type) {
+            const loginBtn = document.getElementById('tab-login');
+            const regBtn = document.getElementById('tab-register');
+            const loginForm = document.getElementById('form-login');
+            const regForm = document.getElementById('form-register');
+
+            if (type === 'login') {
+                loginBtn.className = 'py-2.5 font-headline font-bold text-xs rounded-xl bg-emerald-500 text-slate-950 shadow-md transition-all';
+                regBtn.className = 'py-2.5 font-headline font-bold text-xs rounded-xl text-slate-400 hover:text-white transition-all';
+                loginForm.classList.remove('hidden');
+                regForm.classList.add('hidden');
+            } else {
+                regBtn.className = 'py-2.5 font-headline font-bold text-xs rounded-xl bg-emerald-500 text-slate-950 shadow-md transition-all';
+                loginBtn.className = 'py-2.5 font-headline font-bold text-xs rounded-xl text-slate-400 hover:text-white transition-all';
+                regForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+            }
+        }
+
+        async function handleLoginSubmit(e) {
             e.preventDefault();
-            StockCraft.ui.showToast('Login Successful!', 'Welcome to StockCraft AI.', 'success');
-            setTimeout(() => window.location.href = '/prernaa/user_dashboard/code.html', 1000);
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-password').value;
+
+            const res = await StockCraft.login(email, pass);
+            if (res.success) {
+                StockCraft.ui.showToast('Login Successful!', `Welcome back, ${res.user.name}!`, 'success');
+                setTimeout(() => window.location.href = '/prernaa/user_dashboard/code.html', 1000);
+            } else {
+                StockCraft.ui.showToast('Login Failed', res.message, 'error');
+            }
+        }
+
+        async function handleRegisterSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const pass = document.getElementById('reg-password').value;
+            const curr = document.getElementById('reg-currency').value;
+
+            const res = await StockCraft.register(name, email, pass, curr);
+            if (res.success) {
+                StockCraft.ui.showToast('Account Created!', 'Your account has been registered with $25,000 starting bonus.', 'success');
+                setTimeout(() => window.location.href = '/prernaa/user_dashboard/code.html', 1000);
+            } else {
+                StockCraft.ui.showToast('Registration Error', res.message, 'error');
+            }
         }
     </script>
 </body>
