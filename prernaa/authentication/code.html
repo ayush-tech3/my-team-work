@@ -151,7 +151,7 @@
             const res = await StockCraft.login(email, pass);
             if (res.success) {
                 StockCraft.ui.showToast('Login Successful!', `Welcome back, ${res.user.name}!`, 'success');
-                setTimeout(() => window.location.href = '/prernaa/user_dashboard/code.html', 1000);
+                setTimeout(() => window.location.href = '/index.html', 1000);
             } else {
                 StockCraft.ui.showToast('Login Failed', res.message, 'error');
             }
@@ -167,7 +167,7 @@
             const res = await StockCraft.register(name, email, pass, curr);
             if (res.success) {
                 StockCraft.ui.showToast('Account Created!', 'Your account has been registered with $25,000 starting bonus.', 'success');
-                setTimeout(() => window.location.href = '/prernaa/user_dashboard/code.html', 1000);
+                setTimeout(() => window.location.href = '/index.html', 1000);
             } else {
                 StockCraft.ui.showToast('Registration Error', res.message, 'error');
             }

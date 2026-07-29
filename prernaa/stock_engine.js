@@ -475,7 +475,7 @@ window.StockCraft = (function () {
             st.transactions.unshift(txn);
             saveLocalState(st);
 
-            return { success: true, message: `Successfully sold ${shares} shares of ${stock.symbol}!`, receipt: txn };
+            return { success: true, message: `Successfully sold ${shares} shares of ${symbol}!`, receipt: txn };
         },
 
         purchasePlan: function (planName, price) {
@@ -703,6 +703,7 @@ window.StockCraft = (function () {
             `;
         },
 
+        // SEAMLESS CONTINUOUS SCROLLING TICKER TAPE SHOWING ALL STOCKS ("ONE SIDE GO, NEXT SIDE IT CAME")
         renderTickerTape: function () {
             if (!this.isLoggedIn()) return '';
 
@@ -711,10 +712,10 @@ window.StockCraft = (function () {
             const items = stocks.map(s => {
                 const isPos = s.change >= 0;
                 return `
-                <div class="inline-flex items-center gap-2 px-4 py-1 text-xs border-r border-slate-800 whitespace-nowrap">
-                    <span class="font-bold text-slate-200">${s.symbol}</span>
-                    <span class="text-slate-400">${state.currency}${s.price.toFixed(2)}</span>
-                    <span class="${isPos ? 'text-emerald-400' : 'text-rose-400'} font-semibold flex items-center gap-0.5">
+                <div class="inline-flex items-center gap-3 px-5 py-1 text-xs border-r border-slate-800/80 whitespace-nowrap">
+                    <span class="font-black text-white font-headline">${s.symbol}</span>
+                    <span class="text-slate-300 font-mono">${state.currency}${s.price.toFixed(2)}</span>
+                    <span class="${isPos ? 'text-emerald-400 bg-emerald-500/10' : 'text-rose-400 bg-rose-500/10'} px-2 py-0.5 rounded-md font-bold flex items-center gap-0.5 text-[11px]">
                         <span class="material-symbols-outlined text-xs">${isPos ? 'trending_up' : 'trending_down'}</span>
                         ${s.changePercent}
                     </span>
@@ -723,9 +724,23 @@ window.StockCraft = (function () {
             }).join('');
 
             return `
-            <div class="w-full bg-slate-900/80 border-b border-slate-800/80 overflow-hidden py-1">
-                <div class="flex animate-marquee hover:pause whitespace-nowrap">
-                    ${items}${items}
+            <style>
+                @keyframes stockTickerMove {
+                    0% { transform: translateX(0%); }
+                    100% { transform: translateX(-50%); }
+                }
+                .ticker-scroll-track {
+                    display: flex;
+                    width: max-content;
+                    animation: stockTickerMove 30s linear infinite;
+                }
+                .ticker-scroll-track:hover {
+                    animation-play-state: paused;
+                }
+            </style>
+            <div class="w-full bg-slate-950/90 backdrop-blur-md border-b border-slate-800/80 overflow-hidden py-1 z-40 relative">
+                <div class="ticker-scroll-track">
+                    ${items}${items}${items}${items}
                 </div>
             </div>
             `;
