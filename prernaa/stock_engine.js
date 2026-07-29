@@ -207,7 +207,7 @@ window.StockCraft = (function () {
             currency: '$',
             cash: 25000.00,
             plan: 'Free Learner',
-            name: 'Demo Trader',
+            name: 'Trader Account',
             portfolio: [
                 { symbol: 'SPY', shares: 10, avgPrice: 535.00 },
                 { symbol: 'AAPL', shares: 15, avgPrice: 215.00 }
@@ -563,30 +563,43 @@ window.StockCraft = (function () {
             return responseText;
         },
 
-        // PROMINENT TOP-RIGHT AUTHENTICATION CONTROLS
+        // DYNAMIC NAVBAR: SHOWS TABS ONLY AFTER LOGIN!
         renderNavbar: function (activePage = 'home') {
             const state = getLocalState();
             const loggedIn = this.isLoggedIn();
 
-            const links = [
-                { name: 'Home', url: '/index.html', key: 'home', icon: 'home' },
-                { name: 'Beginner Academy', url: '/prernaa/solutions_page/code.html', key: 'academy', icon: 'school' },
-                { name: 'Trading Dashboard', url: '/prernaa/user_dashboard/code.html', key: 'dashboard', icon: 'dashboard' },
-                { name: 'AI Copilot', url: '/prernaa/market_intelligence/code.html', key: 'ai', icon: 'auto_awesome' },
-                { name: 'Chart Studio', url: '/prernaa/market_visualization/code.html', key: 'charts', icon: 'show_chart' },
-                { name: 'Pricing & Plans', url: '/prernaa/pricing_page/code.html', key: 'pricing', icon: 'workspace_premium' }
-            ];
+            let middleNavItems = '';
+            
+            // ONLY SHOW INTERNAL NAVIGATION LINKS AFTER LOGIN!
+            if (loggedIn) {
+                const links = [
+                    { name: 'Home', url: '/index.html', key: 'home', icon: 'home' },
+                    { name: 'Beginner Academy', url: '/prernaa/solutions_page/code.html', key: 'academy', icon: 'school' },
+                    { name: 'Trading Dashboard', url: '/prernaa/user_dashboard/code.html', key: 'dashboard', icon: 'dashboard' },
+                    { name: 'AI Copilot', url: '/prernaa/market_intelligence/code.html', key: 'ai', icon: 'auto_awesome' },
+                    { name: 'Chart Studio', url: '/prernaa/market_visualization/code.html', key: 'charts', icon: 'show_chart' },
+                    { name: 'Pricing & Plans', url: '/prernaa/pricing_page/code.html', key: 'pricing', icon: 'workspace_premium' }
+                ];
 
-            const navItems = links.map(link => {
-                const isActive = link.key === activePage;
-                const activeClass = isActive 
-                    ? 'text-emerald-400 bg-emerald-500/10 font-bold border-b-2 border-emerald-400' 
-                    : 'text-slate-300 hover:text-white hover:bg-slate-800/50';
-                return `<a href="${link.url}" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all ${activeClass}">
-                    <span class="material-symbols-outlined text-lg">${link.icon}</span>
-                    <span>${link.name}</span>
-                </a>`;
-            }).join('');
+                middleNavItems = links.map(link => {
+                    const isActive = link.key === activePage;
+                    const activeClass = isActive 
+                        ? 'text-emerald-400 bg-emerald-500/10 font-bold border-b-2 border-emerald-400' 
+                        : 'text-slate-300 hover:text-white hover:bg-slate-800/50';
+                    return `<a href="${link.url}" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all ${activeClass}">
+                        <span class="material-symbols-outlined text-lg">${link.icon}</span>
+                        <span>${link.name}</span>
+                    </a>`;
+                }).join('');
+            } else {
+                // BEFORE LOGIN: Clean single home indicator
+                middleNavItems = `
+                    <a href="/index.html" class="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-400 font-bold text-sm border border-emerald-500/20">
+                        <span class="material-symbols-outlined text-lg">home</span>
+                        <span>What is StockCraft.AI</span>
+                    </a>
+                `;
+            }
 
             // TOP-RIGHT CORNER PROMINENT AUTH BUTTONS
             let topRightControls = '';
@@ -612,11 +625,11 @@ window.StockCraft = (function () {
             } else {
                 topRightControls = `
                 <div class="flex items-center gap-3">
-                    <a href="/prernaa/authentication/code.html" class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-100 border border-slate-700/90 text-xs font-headline font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5">
+                    <a href="/prernaa/authentication/code.html" class="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-slate-100 border border-slate-700/90 text-xs font-headline font-bold rounded-xl shadow-md hover:border-emerald-400 transition-all flex items-center gap-1.5">
                         <span class="material-symbols-outlined text-base text-slate-400">login</span>
                         <span>Sign In</span>
                     </a>
-                    <a href="/prernaa/authentication/code.html?mode=register" class="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-headline font-black text-xs rounded-xl shadow-xl shadow-emerald-500/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5">
+                    <a href="/prernaa/authentication/code.html?mode=register" class="px-6 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-headline font-black text-xs rounded-xl shadow-xl shadow-emerald-500/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5">
                         <span class="material-symbols-outlined text-base">person_add</span>
                         <span>Sign Up</span>
                     </a>
@@ -635,7 +648,7 @@ window.StockCraft = (function () {
                     </a>
 
                     <div class="hidden lg:flex items-center gap-1">
-                        ${navItems}
+                        ${middleNavItems}
                     </div>
 
                     ${topRightControls}
