@@ -5,7 +5,7 @@
 ---
 
 ## 🌐 Live Production Links
-- 🚀 **Live Production Web App (Netlify)**: [https://magenta-donut-814206.netlify.app/](https://magenta-donut-814206.netlify.app/)
+- 🚀 **Live Production Web App (Netlify)**: [https://stockcraft-ai.netlify.app/](https://stockcraft-ai.netlify.app/)
 - 🐙 **GitHub Repository**: [https://github.com/ayush-tech3/my-team-work](https://github.com/ayush-tech3/my-team-work)
 
 ---
